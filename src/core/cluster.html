@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Clustering Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .text-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .text-box {
+            flex: 1;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="number"], input[type="text"] {
+            width: 60px;
+            padding: 5px;
+        }
+        .cluster-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .cluster-table th, .cluster-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .cluster-table th {
+            background-color: #f2f2f2;
+        }
+        .cluster-content {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .cluster-content:hover {
+            white-space: normal;
+            overflow: visible;
+        }
+        .separator-list {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .separator-item {
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .separator-item button {
+            padding: 2px 5px;
+            margin-left: 5px;
+            background-color: #ff6b6b;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Clustering Demo</h1>
+    
+    <div class="text-container">
+        <div class="text-box">
+            <h2>Text 1</h2>
+            <textarea id="text1">Dies ist ein Beispieltext. Dieser Text wird mit dem zweiten Text verglichen, um ähnliche Textabschnitte zu finden.</textarea>
+        </div>
+        
+        <div class="text-box">
+            <h2>Text 2</h2>
+            <textarea id="text2">Dies ist ein anderer Text zum Vergleich. Dieser Text enthält einen ähnlichen Abschnitt wie der erste Text, nämlich "um ähnliche Textabschnitte zu finden".</textarea>
+        </div>
+    </div>
+    
+    <div class="options-grid">
+        <div>
+            <h3>Cluster-Optionen</h3>
+            <div>
+                <label for="minLength">Minimale Cluster-Länge:</label>
+                <input type="number" id="minLength" value="5" min="1">
+            </div>
+
+            <div style="margin-top: 10px;">
+                <label for="toLowerCase">
+                    <input type="checkbox" id="toLowerCase" checked> Text in Kleinbuchstaben umwandeln
+                </label>
+            </div>
+        </div>
+        
+        <div>
+            <h3>Trennzeichen</h3>
+            <div>
+                <input type="text" id="separatorInput" placeholder="Trennzeichen" style="width: 100px">
+                <button id="addSeparatorButton">Hinzufügen</button>
+            </div>
+            <div id="separatorList" class="separator-list">
+                <!-- Trennzeichen werden hier angezeigt -->
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button id="findClustersButton">Cluster finden</button>
+    </div>
+    
+    <div id="clusterResults" style="margin-top: 20px;">
+        <p>Cluster-Ergebnisse werden hier angezeigt...</p>
+    </div>
+    
+    <script type="module" src="clusterdemo.js"></script>
+</body>
+</html>

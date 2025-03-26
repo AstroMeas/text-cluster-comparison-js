@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Clustering Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Preprocessing Demo</h1>
+    
+    <div>
+        <h2>Eingabetext</h2>
+        <textarea id="inputText">Hello, world! This is a test text for preprocessing.</textarea>
+        
+        <h3>Optionen</h3>
+        <div>
+            <label>
+                <input type="checkbox" id="toLowerCase"> Text in Kleinbuchstaben umwandeln
+            </label>
+        </div>
+        
+        <h3>Zeichenersetzung</h3>
+        <div>
+            <input type="text" id="originalChar" placeholder="Original" style="width: 100px">
+            <input type="text" id="replacementChar" placeholder="Ersatz" style="width: 100px">
+            <button id="addReplacement">Hinzufügen</button>
+        </div>
+        <div id="replacementList" style="margin-top: 10px;">
+            <!-- Ersetzungsliste wird hier angezeigt -->
+        </div>
+        
+        <h3>Trennzeichen</h3>
+        <div>
+            <input type="text" id="separator" placeholder="Trennzeichen" style="width: 100px">
+            <button id="addSeparator">Hinzufügen</button>
+        </div>
+        <div id="separatorList" style="margin-top: 10px;">
+            <!-- Trennzeichenliste wird hier angezeigt -->
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button id="processButton">Text verarbeiten</button>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <h2>Ergebnis</h2>
+        <pre id="outputResult">Die verarbeiteten Tokens werden hier angezeigt...</pre>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>
