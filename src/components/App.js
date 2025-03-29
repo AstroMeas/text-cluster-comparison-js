@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ClusterTable from './cluster_table/ClusterTable';
 import BubbleChart from './charts/BubbleChart';
-import LineChart from './charts/LineChart';
+import ComparisonTable from './comparison_table/ComparisonTable';
 import ChartControls from './charts/ChartControls';
 import useClusterData from '../hooks/useClusterData';
 
@@ -13,7 +13,7 @@ const App = () => {
   const clusterData = useClusterData();
   
   // Zustand für die aktive Visualisierung
-  const [activeChart, setActiveChart] = useState('table'); // 'table', 'bubble', 'line'
+  const [activeChart, setActiveChart] = useState('table'); // 'table', 'bubble', 'comparison'
   
   // Hilfsfunktion zum Darstellen der Eingabefelder für Trennzeichen
   const renderSeparatorsList = () => {
@@ -89,12 +89,14 @@ const App = () => {
       );
     }
     
-    // Line-Chart anzeigen
-    if (activeChart === 'line') {
+    // Textvergleich anzeigen
+    if (activeChart === 'comparison') {
       return (
-        <LineChart 
-          data={clusterData.getLineChartData()} 
-          title="Cluster-Positionen (Linien-Diagramm)"
+        <ComparisonTable
+          clusters={clusterData.clusters}
+          processed1={clusterData.processed1}
+          processed2={clusterData.processed2}
+          isAscending={clusterData.isAscending}
         />
       );
     }
@@ -206,6 +208,7 @@ const App = () => {
         <ChartControls 
           activeChart={activeChart} 
           onChangeChart={setActiveChart} 
+          isAscending={clusterData.isAscending}
         />
       )}
       

@@ -4,7 +4,6 @@ import {
   isColumnAscending,
   cleanClusterTable,
   convertToBubbleChartData,
-  convertToLineChartData,
   convertClustersToCSV
 } from '../services/clusterService';
 
@@ -113,15 +112,6 @@ const useClusterData = () => {
   }, [clusters]);
   
   /**
-   * Bereitet Daten für ein Linien-Diagramm vor
-   * @returns {Array} - Daten für ein Linien-Diagramm mit Plotly
-   */
-  const getLineChartData = useCallback(() => {
-    if (clusters.length === 0) return null;
-    return convertToLineChartData(clusters);
-  }, [clusters]);
-  
-  /**
    * Lädt die Cluster-Ergebnisse als CSV-Datei herunter
    */
   const downloadClustersCSV = useCallback(() => {
@@ -200,7 +190,6 @@ const useClusterData = () => {
     analyzeClusters,
     cleanClusters,
     getBubbleChartData,
-    getLineChartData,
     downloadClustersCSV,
     addSeparator,
     removeSeparator

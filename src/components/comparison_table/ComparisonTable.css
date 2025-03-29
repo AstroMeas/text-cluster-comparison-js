@@ -1,0 +1,143 @@
+/* ComparisonTable.css */
+
+.comparison-table-container {
+    margin-top: 20px;
+    overflow-x: auto;
+  }
+  
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .comparison-table th,
+  .comparison-table td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .comparison-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .comparison-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .comparison-table tr:hover {
+    background-color: #f0f7ff;
+  }
+  
+  /* Zellstile für einzigartige Elemente */
+  .unique-row td {
+    background-color: #ffedd5;
+  }
+  
+  .unique-row:hover td {
+    background-color: #ffe4c4;
+  }
+  
+  /* Zellstile für Cluster-Elemente */
+  .cluster-row td {
+    background-color: #d1e7dd;
+  }
+  
+  .cluster-row:hover td {
+    background-color: #c1e0d6;
+  }
+  
+  .comparison-content {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+  
+  .comparison-content:hover {
+    white-space: normal;
+    overflow: visible;
+    background-color: #fffde7;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 5px;
+    z-index: 20;
+    position: relative;
+  }
+  
+  .comparison-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .comparison-description {
+    margin-bottom: 15px;
+    color: #555;
+    font-style: italic;
+  }
+  
+  .download-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .download-button:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  
+  .pagination-button {
+    padding: 5px 10px;
+    background-color: #f5f5f5;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .pagination-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .pagination-button.active {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .pagination-info {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  /* Responsive Anpassungen */
+  @media (max-width: 768px) {
+    .comparison-content {
+      max-width: 150px;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+      padding: 8px 5px;
+      font-size: 0.9rem;
+    }
+  }

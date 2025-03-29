@@ -4,10 +4,11 @@ import React from 'react';
  * Chart-Kontrollkomponente zur Auswahl des anzuzeigenden Diagrammtyps
  * 
  * @param {Object} props - Komponenten-Properties
- * @param {string} props.activeChart - Aktuell ausgewähltes Diagramm ('table', 'bubble', 'line')
+ * @param {string} props.activeChart - Aktuell ausgewähltes Diagramm ('table', 'bubble', 'comparison')
  * @param {Function} props.onChangeChart - Callback für die Änderung des Diagrammtyps
+ * @param {boolean} props.isAscending - Gibt an, ob Cluster aufsteigend sortiert sind
  */
-const ChartControls = ({ activeChart, onChangeChart }) => {
+const ChartControls = ({ activeChart, onChangeChart, isAscending = false }) => {
   // Stil für die Container-Karte
   const cardStyle = {
     display: 'flex',
@@ -37,6 +38,17 @@ const ChartControls = ({ activeChart, onChangeChart }) => {
     transition: 'all 0.3s'
   });
   
+  // Stil für deaktivierte Schaltflächen
+  const disabledButtonStyle = {
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: '#cccccc',
+    color: '#888888',
+    cursor: 'not-allowed',
+    opacity: 0.7
+  };
+  
   return (
     <div style={cardStyle}>
       <div>
@@ -46,7 +58,7 @@ const ChartControls = ({ activeChart, onChangeChart }) => {
             style={buttonStyle(activeChart === 'table')}
             onClick={() => onChangeChart('table')}
           >
-            Tabelle
+            Cluster-Tabelle
           </button>
           <button
             style={buttonStyle(activeChart === 'bubble')}
@@ -55,10 +67,12 @@ const ChartControls = ({ activeChart, onChangeChart }) => {
             Bubble-Chart
           </button>
           <button
-            style={buttonStyle(activeChart === 'line')}
-            onClick={() => onChangeChart('line')}
+            style={isAscending ? buttonStyle(activeChart === 'comparison') : disabledButtonStyle}
+            onClick={() => isAscending && onChangeChart('comparison')}
+            disabled={!isAscending}
+            title={!isAscending ? "Nur verfügbar, wenn Cluster aufsteigend sortiert sind" : ""}
           >
-            Linien-Diagramm
+            Textvergleich
           </button>
         </div>
       </div>

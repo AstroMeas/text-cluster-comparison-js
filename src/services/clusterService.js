@@ -305,30 +305,161 @@ export const convertToBubbleChartData = (clusters) => {
 };
 
 /**
- * Konvertiert Cluster-Daten für die LineChart-Visualisierung
- * @param {Array} clusters - Die zu konvertierenden Cluster-Daten
- * @returns {Array} - Daten für ein Linien-Diagramm mit Plotly
+ * Vergleicht zwei Texte und organisiert deren Ähnlichkeiten und einzigartige Elemente in einer strukturierten Datenstruktur
+ * @param {Array} a - Die erste Sequenz zum Vergleich
+ * @param {Array} b - Die zweite Sequenz zum Vergleich
+ * @param {Array} clusterArray - Ein Array mit Cluster-Informationen
+ * @param {string} textAName - Der Name der ersten Sequenz für die Kennzeichnung (default: 'text1')
+ * @param {string} textBName - Der Name der zweiten Sequenz für die Kennzeichnung (default: 'text2')
+ * @returns {Array} - Ein Array mit strukturierten Vergleichsdaten
  */
-export const convertToLineChartData = (clusters) => {
-  // Sortiere die Cluster nach start_text1
-  const sortedClusters = [...clusters].sort((a, b) => a.start_text1 - b.start_text1);
+export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textBName = 'text2') => {
+  // Ergebnis-Array vorbereiten
+  const comparisonResult = [];
   
-  return [
-    {
-      x: sortedClusters.map(c => c.start_text1),
-      y: sortedClusters.map(c => c.start_text2),
-      mode: 'lines+markers',
-      name: 'Cluster-Positionen',
-      marker: {
-        size: 8,
-        color: 'red'
-      },
-      line: {
-        shape: 'linear',
-        color: 'blue'
-      }
-    }
+  if (!a || !b || !Array.isArray(a) || !Array.isArray(b)) {
+    console.error('Ungültige Eingaben für compareTexts: a und b müssen Arrays sein');
+    return comparisonResult;
+  }
+  
+  if (clusterArray.length === 0) {
+    // Wenn keine Cluster vorhanden sind, Texte als einzigartig betrachten
+    comparisonResult.push({
+      tag: 'unique',
+      [`Pos_${textAName}`]: 0,
+      [`Length_${textAName}`]: a.length,
+      [textAName]: a.join('་'),
+      [`Pos_${textBName}`]: 0,
+      [`Length_${textBName}`]: b.length,
+      [textBName]: b.join('་'),
+      Length_Cluster: 0,
+      Cluster: ''
+    });
+    
+    return comparisonResult;
+  }
+  
+  // Überprüfe, ob die erforderlichen Spalten in den Cluster-Daten vorhanden sind
+  const requiredKeys = [
+    `start_${textAName}`, 
+    `end_${textAName}`, 
+    `start_${textBName}`, 
+    `end_${textBName}`, 
+    'length'
   ];
+  
+  // Überprüfe, ob alle erforderlichen Schlüssel im ersten Cluster-Objekt vorhanden sind
+  if (!requiredKeys.every(key => key in clusterArray[0])) {
+    console.error(`Fehler: clusterArray muss Objekte mit den Eigenschaften ${requiredKeys} enthalten`);
+    return comparisonResult;
+  }
+  
+  let aStart = 0;
+  let bStart = 0;
+  
+  // Iteriere über alle Cluster
+  for (let clusterNr = 0; clusterNr < clusterArray.length; clusterNr++) {
+    // Cluster-Start- und Endpositionen auslesen
+    const startA = clusterArray[clusterNr][`start_${textAName}`];
+    const endA = clusterArray[clusterNr][`end_${textAName}`];
+    const startB = clusterArray[clusterNr][`start_${textBName}`];
+    const endB = clusterArray[clusterNr][`end_${textBName}`];
+    const length = clusterArray[clusterNr].length;
+    
+    // Einzigartige Elemente hinzufügen (vor dem aktuellen Cluster)
+    if (startA > aStart || startB > bStart) {
+      comparisonResult.push({
+        tag: 'unique',
+        [`Pos_${textAName}`]: aStart,
+        [`Length_${textAName}`]: startA - aStart,
+        [textAName]: a.slice(aStart, startA).join('་'),
+        [`Pos_${textBName}`]: bStart,
+        [`Length_${textBName}`]: startB - bStart,
+        [textBName]: b.slice(bStart, startB).join('་'),
+        Length_Cluster: 0,
+        Cluster: ''
+      });
+    }
+    
+    // Cluster hinzufügen
+    comparisonResult.push({
+      tag: 'cluster',
+      [`Pos_${textAName}`]: startA,
+      [`Length_${textAName}`]: 0,
+      [textAName]: '',
+      [`Pos_${textBName}`]: startB,
+      [`Length_${textBName}`]: 0,
+      [textBName]: '',
+      Length_Cluster: length,
+      Cluster: a.slice(startA, endA).join('་')
+    });
+    
+    // Aktualisiere Start-Positionen
+    aStart = endA;
+    bStart = endB;
+  }
+  
+  // Füge die letzten einzigartigen Elemente hinzu (nach dem letzten Cluster)
+  if (aStart < a.length || bStart < b.length) {
+    comparisonResult.push({
+      tag: 'unique',
+      [`Pos_${textAName}`]: aStart,
+      [`Length_${textAName}`]: a.length - aStart,
+      [textAName]: a.slice(aStart).join('་'),
+      [`Pos_${textBName}`]: bStart,
+      [`Length_${textBName}`]: b.length - bStart,
+      [textBName]: b.slice(bStart).join('་'),
+      Length_Cluster: 0,
+      Cluster: ''
+    });
+  }
+  
+  return comparisonResult;
+};
+
+/**
+ * Konvertiert die Vergleichsdaten in einen CSV-String zum Download
+ * @param {Array} comparisonData - Die Vergleichsdaten von compareTexts()
+ * @returns {string} - CSV-String mit den Vergleichsdaten
+ */
+export const convertComparisonToCSV = (comparisonData, textAName = 'text1', textBName = 'text2') => {
+  if (!comparisonData || comparisonData.length === 0) {
+    return '';
+  }
+  
+  // Header-Zeile erstellen
+  const headers = [
+    'Tag', 
+    `Pos_${textAName}`, 
+    `Length_${textAName}`, 
+    textAName, 
+    `Pos_${textBName}`, 
+    `Length_${textBName}`, 
+    textBName, 
+    'Length_Cluster', 
+    'Cluster'
+  ];
+  
+  const rows = [headers.join(',')];
+  
+  // Datenzeilen erstellen
+  comparisonData.forEach(row => {
+    const csvRow = [
+      row.tag,
+      row[`Pos_${textAName}`],
+      row[`Length_${textAName}`],
+      `"${(row[textAName] || '').replace(/"/g, '""')}"`,
+      row[`Pos_${textBName}`],
+      row[`Length_${textBName}`],
+      `"${(row[textBName] || '').replace(/"/g, '""')}"`,
+      row.Length_Cluster,
+      `"${(row.Cluster || '').replace(/"/g, '""')}"`
+    ];
+    
+    rows.push(csvRow.join(','));
+  });
+  
+  return rows.join('\n');
 };
 
 /**
