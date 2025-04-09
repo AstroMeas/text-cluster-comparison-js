@@ -9,7 +9,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '/text-cluster-comparison-js/'
   },
   
   // Regeln für das Laden verschiedener Dateitypen
