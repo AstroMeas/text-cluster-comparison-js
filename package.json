@@ -10,7 +10,9 @@
   "scripts": {
     "start": "webpack serve --mode development --open",
     "build": "webpack --mode production",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/AstroMeas/text-cluster-comparison-js/issues"
   },
-  "homepage": "https://github.com/AstroMeas/text-cluster-comparison-js#readme",
+  "homepage": "https://AstroMeas.github.io/text-cluster-comparison-js",
   "dependencies": {
     "plotly.js": "^3.0.1",
     "react": "^19.1.0",
@@ -38,6 +40,7 @@
     "eslint": "^9.23.0",
     "eslint-plugin-react": "^7.37.4",
     "file-loader": "^6.2.0",
+    "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.6.3",
     "style-loader": "^4.0.0",
     "webpack": "^5.98.0",
