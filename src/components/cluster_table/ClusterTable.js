@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import './ClusterTable.css';
 
 /**
- * ClusterTable-Komponente zur Anzeige der gefundenen Cluster in Tabellenform
+ * ClusterTable component for displaying the found clusters in table format
  * 
- * @param {Object} props - Komponenten-Properties
- * @param {Array} props.clusters - Array mit Cluster-Daten
- * @param {Object} props.processed1 - Verarbeiteter erster Text für den Inhalt
- * @param {boolean} props.isAscending - Ob die start_text2-Spalte aufsteigend sortiert ist
- * @param {Function} props.onCleanClusters - Callback für die Bereinigung der Cluster
- * @param {Function} props.onDownloadCSV - Callback für den Download als CSV
+ * @param {Object} props - Component properties
+ * @param {Array} props.clusters - Array with cluster data
+ * @param {Object} props.processed1 - Processed first text for content
+ * @param {boolean} props.isAscending - Whether the start_text2 column is sorted in ascending order
+ * @param {Function} props.onCleanClusters - Callback for cleaning the clusters
+ * @param {Function} props.onDownloadCSV - Callback for downloading as CSV
  */
 const ClusterTable = ({ 
   clusters = [], 
@@ -18,75 +18,75 @@ const ClusterTable = ({
   onCleanClusters,
   onDownloadCSV
 }) => {
-  // Zustand für Paginierung
+  // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
-  // Zurücksetzen auf die erste Seite, wenn sich die Cluster ändern
+  // Reset to the first page when the clusters change
   useEffect(() => {
     setCurrentPage(1);
   }, [clusters]);
   
-  // Berechnung der Paginierung
+  // Pagination calculation
   const totalPages = Math.ceil(clusters.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentClusters = clusters.slice(indexOfFirstItem, indexOfLastItem);
   
-  // Seiten-Navigation
+  // Page navigation
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   
-  // Keine Cluster vorhanden
+  // No clusters available
   if (clusters.length === 0) {
     return (
       <div className="card">
-        <div className="card-title">Cluster-Ergebnisse</div>
-        <p>Keine Cluster gefunden, die der Mindestlänge entsprechen.</p>
+        <div className="card-title">Cluster Results</div>
+        <p>No clusters found that meet the minimum length.</p>
       </div>
     );
   }
   
   return (
     <div className="card">
-      <div className="card-title">Gefundene Cluster ({clusters.length})</div>
+      <div className="card-title">Found Clusters ({clusters.length})</div>
       
-      {/* Status und Button zur Bereinigung der Cluster */}
+      {/* Status and button to clean clusters */}
       <div className="cluster-status">
-        <span>Cluster sind</span>
+        <span>Clusters are</span>
         {isAscending ? (
-          <span className="status-indicator status-success">aufsteigend sortiert</span>
+          <span className="status-indicator status-success">sorted in ascending order</span>
         ) : (
           <>
-            <span className="status-indicator status-error">nicht aufsteigend sortiert</span>
+            <span className="status-indicator status-error">not sorted in ascending order</span>
             <button 
               className="clean-button" 
               onClick={onCleanClusters}
             >
-              Ausreißer-Cluster entfernen
+              Remove outlier clusters
             </button>
           </>
         )}
       </div>
       
-      {/* Cluster-Tabelle */}
+      {/* Cluster table */}
       <div className="cluster-table-container">
         <table className="cluster-table">
           <thead>
             <tr>
               <th>Start Text 1</th>
-              <th>Ende Text 1</th>
+              <th>End Text 1</th>
               <th>Start Text 2</th>
-              <th>Ende Text 2</th>
-              <th>Länge</th>
-              <th>Differenz</th>
-              <th>Inhalt</th>
+              <th>End Text 2</th>
+              <th>Length</th>
+              <th>Difference</th>
+              <th>Content</th>
             </tr>
           </thead>
           <tbody>
             {currentClusters.map((cluster, index) => {
-              // Originalen Text für den Cluster abrufen
+              // Get original text for the cluster
               const start1 = cluster.start_text1;
               const end1 = cluster.end_text1;
               const clusterContent = processed1?.stringTokens.slice(start1, end1).join(' ') || '';
@@ -107,7 +107,7 @@ const ClusterTable = ({
         </table>
       </div>
       
-      {/* Paginierung */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <>
           <div className="pagination">
@@ -116,12 +116,12 @@ const ClusterTable = ({
               onClick={goToPrevPage}
               disabled={currentPage === 1}
             >
-              &laquo; Zurück
+              &laquo; Previous
             </button>
             
-            {/* Seitenzahlen */}
+            {/* Page numbers */}
             {[...Array(totalPages)].map((_, i) => {
-              // Beschränke die Anzahl der angezeigten Seitenzahlen
+              // Limit the number of displayed page numbers
               if (
                 i === 0 || 
                 i === totalPages - 1 || 
@@ -137,7 +137,7 @@ const ClusterTable = ({
                   </button>
                 );
               }
-              // Ellipsis für ausgelassene Seiten
+              // Ellipsis for skipped pages
               if (i === currentPage - 3 || i === currentPage + 3) {
                 return <span key={i}>...</span>;
               }
@@ -149,22 +149,22 @@ const ClusterTable = ({
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
             >
-              Weiter &raquo;
+              Next &raquo;
             </button>
           </div>
           <div className="pagination-info">
-            Seite {currentPage} von {totalPages}
+            Page {currentPage} of {totalPages}
           </div>
         </>
       )}
       
-      {/* Download-Button */}
+      {/* Download button */}
       <div className="actions-container">
         <button 
           className="download-button" 
           onClick={onDownloadCSV}
         >
-          Ergebnisse herunterladen (CSV)
+          Download results (CSV)
         </button>
       </div>
     </div>

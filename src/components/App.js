@@ -6,23 +6,23 @@ import ChartControls from './charts/ChartControls';
 import useClusterData from '../hooks/useClusterData';
 
 /**
- * Hauptkomponente der Anwendung
+ * Main component of the application
  */
 const App = () => {
-  // Hook für die Cluster-Daten und -Verarbeitung
+  // Hook for cluster data and processing
   const clusterData = useClusterData();
   
-  // Zustand für die aktive Visualisierung
+  // State for active visualization
   const [activeChart, setActiveChart] = useState('table'); // 'table', 'bubble', 'comparison'
   
-  // Hilfsfunktion zum Darstellen der Eingabefelder für Trennzeichen
+  // Helper function to display input fields for separators
   const renderSeparatorsList = () => {
     return (
       <div className="separator-list">
         {clusterData.separators.map((separator, index) => {
-          // Besondere Darstellung für spezielle Zeichen
-          const displayText = separator === ' ' ? '␣ (Leerzeichen)' : 
-                              separator === '\n' ? '↵ (Zeilenumbruch)' :
+          // Special representation for special characters
+          const displayText = separator === ' ' ? '␣ (Space)' : 
+                              separator === '\n' ? '↵ (Line Break)' :
                               separator === '\t' ? '→ (Tab)' : separator;
           
           return (
@@ -41,7 +41,7 @@ const App = () => {
     );
   };
   
-  // Hilfsfunktion zum Hinzufügen eines neuen Trennzeichens
+  // Helper function to add a new separator
   const handleAddSeparator = (e) => {
     e.preventDefault();
     const separatorInput = e.target.elements.separatorInput;
@@ -53,20 +53,20 @@ const App = () => {
     }
   };
   
-  // Hilfsfunktion zum Rendern des aktiven Diagramms
+  // Helper function to render the active chart
   const renderActiveChart = () => {
-    // Keine Cluster vorhanden
+    // No clusters available
     if (clusterData.clusters.length === 0) {
       return (
         <div className="card">
           <p>
-            Keine Cluster gefunden. Bitte gib Texte ein und klicke auf "Cluster finden".
+            No clusters found. Please enter texts and click on "Find Clusters".
           </p>
         </div>
       );
     }
     
-    // Cluster-Tabelle anzeigen
+    // Display cluster table
     if (activeChart === 'table') {
       return (
         <ClusterTable 
@@ -79,17 +79,17 @@ const App = () => {
       );
     }
     
-    // Bubble-Chart anzeigen
+    // Display bubble chart
     if (activeChart === 'bubble') {
       return (
         <BubbleChart 
           data={clusterData.getBubbleChartData()} 
-          title="Cluster-Positionen (Bubble-Chart)"
+          title="Cluster Positions (Bubble Chart)"
         />
       );
     }
     
-    // Textvergleich anzeigen
+    // Display text comparison
     if (activeChart === 'comparison') {
       return (
         <ComparisonTable
@@ -108,9 +108,9 @@ const App = () => {
     <div className="container">
       <h1 className="app-title">Text Cluster Comparison</h1>
       
-      {/* Texteingabe */}
+      {/* Text Input */}
       <div className="card">
-        <h2 className="card-title">Texteingabe</h2>
+        <h2 className="card-title">Text Input</h2>
         <div className="grid-container">
           {/* Text 1 */}
           <div>
@@ -120,7 +120,7 @@ const App = () => {
               value={clusterData.text1}
               onChange={(e) => clusterData.setText1(e.target.value)}
               rows={10}
-              placeholder="Gib den ersten Text hier ein..."
+              placeholder="Enter the first text here..."
             ></textarea>
           </div>
           
@@ -132,17 +132,17 @@ const App = () => {
               value={clusterData.text2}
               onChange={(e) => clusterData.setText2(e.target.value)}
               rows={10}
-              placeholder="Gib den zweiten Text hier ein..."
+              placeholder="Enter the second text here..."
             ></textarea>
           </div>
         </div>
         
         <div className="grid-container">
-          {/* Cluster-Optionen */}
+          {/* Cluster Options */}
           <div>
-            <h3>Cluster-Optionen</h3>
+            <h3>Cluster Options</h3>
             <div>
-              <label htmlFor="minLength">Minimale Cluster-Länge:</label>
+              <label htmlFor="minLength">Minimum Cluster Length:</label>
               <input
                 type="number"
                 id="minLength"
@@ -161,24 +161,24 @@ const App = () => {
                   checked={clusterData.toLowerCase}
                   onChange={(e) => clusterData.setToLowerCase(e.target.checked)}
                 />
-                {' '}Text in Kleinbuchstaben umwandeln
+                {' '}Convert text to lowercase
               </label>
             </div>
           </div>
           
-          {/* Trennzeichen */}
+          {/* Separators */}
           <div>
-            <h3>Trennzeichen</h3>
+            <h3>Separators</h3>
             <form onSubmit={handleAddSeparator}>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input
                   type="text"
                   id="separatorInput"
                   name="separatorInput"
-                  placeholder="Trennzeichen"
+                  placeholder="Separator"
                   style={{ width: '150px', flex: '1' }}
                 />
-                <button type="submit" className="btn-primary">Hinzufügen</button>
+                <button type="submit" className="btn-primary">Add</button>
               </div>
             </form>
             {renderSeparatorsList()}
@@ -191,11 +191,11 @@ const App = () => {
             onClick={clusterData.analyzeClusters}
             disabled={clusterData.isLoading}
           >
-            {clusterData.isLoading ? 'Verarbeite...' : 'Cluster finden'}
+            {clusterData.isLoading ? 'Processing...' : 'Find Clusters'}
           </button>
         </div>
         
-        {/* Fehleranzeige */}
+        {/* Error display */}
         {clusterData.error && (
           <div style={{ marginTop: '15px', color: 'red' }}>
             {clusterData.error}
@@ -203,7 +203,7 @@ const App = () => {
         )}
       </div>
       
-      {/* Visualisierungsauswahl */}
+      {/* Visualization selection */}
       {clusterData.clusters.length > 0 && (
         <ChartControls 
           activeChart={activeChart} 
@@ -212,7 +212,7 @@ const App = () => {
         />
       )}
       
-      {/* Aktives Diagramm */}
+      {/* Active chart */}
       <div className="results-container">
         {renderActiveChart()}
       </div>

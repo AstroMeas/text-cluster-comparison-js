@@ -1,21 +1,21 @@
 /**
- * Service für die Verarbeitung von Cluster-Daten
- * Dieser Service stellt Funktionen bereit, um Textdaten zu verarbeiten,
- * Cluster zu finden und die Daten für Visualisierungen aufzubereiten.
+ * Service for processing cluster data
+ * This service provides functions to process text data,
+ * find clusters, and prepare data for visualizations.
  */
 
-// Importiere die benötigten Core-Funktionen
+// Import the required core functions
 import { clusterPreprocess } from '../core/preprocessing.js';
 import { findClusters } from '../core/clusterSearch.js';
 
 /**
- * Prozessiert zwei Texte und findet Cluster
- * @param {string} text1 - Der erste Text
- * @param {string} text2 - Der zweite Text
- * @param {number} minLength - Minimale Länge für ein Cluster
- * @param {Array<string>} separators - Trennzeichen für die Textverarbeitung
- * @param {boolean} toLowerCase - Text in Kleinbuchstaben umwandeln
- * @returns {Object} - Verarbeitete Texte und gefundene Cluster
+ * Processes two texts and finds clusters
+ * @param {string} text1 - The first text
+ * @param {string} text2 - The second text
+ * @param {number} minLength - Minimum length for a cluster
+ * @param {Array<string>} separators - Separators for text processing
+ * @param {boolean} toLowerCase - Convert text to lowercase
+ * @returns {Object} - Processed texts and found clusters
  */
 export const processTextsAndFindClusters = (
   text1,
@@ -24,17 +24,17 @@ export const processTextsAndFindClusters = (
   separators = [' ', ',', '.', '!', '?', ';', ':', '\n', '\t'],
   toLowerCase = true
 ) => {
-  // Einstellungen für die Vorverarbeitung
+  // Settings for preprocessing
   const preprocessOptions = {
     toLowerCase: toLowerCase,
     separators: separators
   };
   
-  // Texte vorverarbeiten
+  // Preprocess texts
   const processed1 = clusterPreprocess(text1, preprocessOptions);
   const processed2 = clusterPreprocess(text2, preprocessOptions);
   
-  // Cluster finden
+  // Find clusters
   const clusters = findClusters(processed1, processed2, minLength, 'text1', 'text2');
   
   return {
@@ -45,10 +45,10 @@ export const processTextsAndFindClusters = (
 };
 
 /**
- * Überprüft, ob die Werte in einer Spalte aufsteigend sortiert sind
- * @param {Array} clusters - Die Cluster-Liste
- * @param {string} columnName - Der Name der zu überprüfenden Spalte
- * @returns {boolean} - True, wenn die Spalte aufsteigend sortiert ist
+ * Checks if the values in a column are sorted in ascending order
+ * @param {Array} clusters - The cluster list
+ * @param {string} columnName - The name of the column to check
+ * @returns {boolean} - True if the column is sorted in ascending order
  */
 export const isColumnAscending = (clusters, columnName = 'start_text2') => {
   if (clusters.length <= 1) return true;
@@ -63,18 +63,18 @@ export const isColumnAscending = (clusters, columnName = 'start_text2') => {
 };
 
 /**
- * Entfernt Ausreißer-Cluster basierend auf Positionssprüngen in Text B
- * @param {Array} clusters - Die Cluster-Array
- * @param {string} textBStartCol - Spaltenname für die Startposition in Text B
- * @returns {Array} - Gefiltertes Array ohne Ausreißer-Cluster
+ * Removes outlier clusters based on position jumps in Text B
+ * @param {Array} clusters - The cluster array
+ * @param {string} textBStartCol - Column name for the start position in Text B
+ * @returns {Array} - Filtered array without outlier clusters
  */
 export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') => {
   if (clusters.length <= 1) return clusters;
   
-  // Kopie des Cluster-Arrays erstellen
+  // Create a copy of the cluster array
   const df = [...clusters];
   
-  // Differenzen zwischen aufeinanderfolgenden Startpositionen berechnen
+  // Calculate differences between consecutive start positions
   const diffs = [];
   const flags = [];
   
@@ -87,36 +87,36 @@ export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') 
     flags.push(0);
   }
   
-  // Zeilen mit negativen Differenzen markieren (potenzielle Ausreißer)
+  // Mark rows with negative differences (potential outliers)
   for (let i = 0; i < diffs.length; i++) {
     if (diffs[i] !== null && diffs[i] < 0) {
       flags[i] = 1;
-      // Auch die vorherige Zeile markieren
+      // Also mark the previous row
       if (i > 0) {
         flags[i-1] = 1;
       }
     }
   }
   
-  // Array zum Markieren von zu entfernenden Zeilen
+  // Array for marking rows to be removed
   const removeIndexes = new Array(df.length).fill(0);
   
-  // Jede Zeile verarbeiten, um Ausreißer zu identifizieren
+  // Process each row to identify outliers
   for (let i = 0; i < df.length; i++) {
-    // Erste Zeile überspringen
+    // Skip first row
     if (i === 0) continue;
     
-    // Letzten Zeilenfalls behandeln
+    // Handle last row case
     if (i + 1 === df.length && flags[i] === 1) {
       removeIndexes[i] = 1;
       continue;
     }
     
-    // Aufeinanderfolgende markierte Zeilen überprüfen
+    // Check consecutive marked rows
     if (flags[i] === 1 && flags[i-1] === 1) {
       let offset = 1;
       
-      // Nach passender Grenze suchen
+      // Look for suitable boundary
       while ((i - offset) > 0 && (i + offset + 1) < df.length) {
         if (df[i][textBStartCol] > df[i-offset-1][textBStartCol] || 
             df[i-1][textBStartCol] < df[i+offset][textBStartCol]) {
@@ -126,7 +126,7 @@ export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') 
         }
       }
       
-      // Zeilen basierend auf erkanntem Muster zur Entfernung markieren
+      // Mark rows for removal based on identified pattern
       if (df[i-1][textBStartCol] <= df[i+offset][textBStartCol]) {
         for (let j = i; j < i + offset; j++) {
           removeIndexes[j] = 1;
@@ -136,12 +136,12 @@ export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') 
           removeIndexes[j] = 1;
         }
       } else {
-        console.log(`Problem bei Index ${i}`);
+        console.log(`Problem at index ${i}`);
       }
     }
   }
   
-  // Zeilen vom Ende her verarbeiten, um nachlaufende Ausreißer zu entfernen
+  // Process rows from the end to remove trailing outliers
   for (let i = df.length - 1; i > 0; i--) {
     if (flags[i] === 1) {
       removeIndexes[i] = 1;
@@ -150,7 +150,7 @@ export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') 
     }
   }
   
-  // Indizes zum Entfernen erhalten
+  // Get indices to remove
   const dropIndices = [];
   for (let i = 0; i < removeIndexes.length; i++) {
     if (removeIndexes[i] === 1) {
@@ -158,10 +158,10 @@ export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') 
     }
   }
   
-  // Identifizierte Ausreißer entfernen
+  // Remove identified outliers
   const result = df.filter((_, index) => !dropIndices.includes(index));
   
-  // Duplikate entfernen (gleiche Startposition in Text B)
+  // Remove duplicates (same start position in Text B)
   const uniqueResult = [];
   
   for (let i = 0; i < result.length; i++) {
@@ -175,12 +175,12 @@ export const removeOutlyingClusters = (clusters, textBStartCol = 'start_text2') 
 };
 
 /**
- * Entfernt überlappende Cluster in Text A
- * @param {Array} clusterDf - Cluster-Array
- * @param {string} startACol - Spaltenname für die Startposition in Text A
- * @param {string} endACol - Spaltenname für die Endposition in Text A
- * @param {boolean} verbose - Ob Informationen über entfernte Zeilen ausgegeben werden sollen
- * @returns {Array} - Gefiltertes Array ohne überlappende Cluster
+ * Removes overlapping clusters in Text A
+ * @param {Array} clusterDf - Cluster array
+ * @param {string} startACol - Column name for the start position in Text A
+ * @param {string} endACol - Column name for the end position in Text A
+ * @param {boolean} verbose - Whether information about removed rows should be output
+ * @returns {Array} - Filtered array without overlapping clusters
  */
 export const removeOverlappingClusters = (
   clusterDf, 
@@ -188,61 +188,61 @@ export const removeOverlappingClusters = (
   endACol = 'end_text1', 
   verbose = false
 ) => {
-  // Eine Kopie des Eingabe-Arrays erstellen
+  // Create a copy of the input array
   const df = [...clusterDf];
   
-  // Anfängliche Anzahl der Cluster
+  // Initial number of clusters
   const initialCount = df.length;
   
-  // Sicherstellen, dass das Array nach start_a sortiert ist
+  // Ensure the array is sorted by start_a
   df.sort((a, b) => a[startACol] - b[startACol]);
   
-  // Array für gültige Zeilen (nicht überlappend)
+  // Array for valid rows (non-overlapping)
   const validRows = new Array(df.length).fill(true);
   
-  // Vorheriger end_a-Wert
+  // Previous end_a value
   let prevEndA = null;
   
-  // Jede Zeile auf Überlappung mit vorheriger prüfen
+  // Check each row for overlap with previous
   for (let idx = 0; idx < df.length; idx++) {
     const currentStartA = df[idx][startACol];
     
-    // Erste Zeile überspringen
+    // Skip first row
     if (prevEndA !== null) {
-      // Wenn aktueller start_a kleiner als vorheriger end_a ist, als ungültig markieren
+      // If current start_a is less than previous end_a, mark as invalid
       if (currentStartA < prevEndA) {
         validRows[idx] = false;
       }
     }
     
-    // Vorherigen end_a aktualisieren
+    // Update previous end_a
     prevEndA = df[idx][endACol];
   }
   
-  // Die Maske anwenden, um überlappende Zeilen zu filtern
+  // Apply the mask to filter overlapping rows
   const filteredDf = df.filter((_, i) => validRows[i]);
   
-  // Anzahl der entfernten Zeilen
+  // Number of removed rows
   const removedCount = initialCount - filteredDf.length;
   
-  // Zusammenfassung ausgeben, wenn verbose
+  // Output summary if verbose
   if (verbose) {
-    console.log(`Anfängliche Cluster: ${initialCount}`);
-    console.log(`Überlappende Cluster entfernt: ${removedCount}`);
-    console.log(`Verbleibende Cluster: ${filteredDf.length}`);
+    console.log(`Initial clusters: ${initialCount}`);
+    console.log(`Overlapping clusters removed: ${removedCount}`);
+    console.log(`Remaining clusters: ${filteredDf.length}`);
   }
   
   return filteredDf;
 };
 
 /**
- * Bereinigt die Cluster-Tabelle durch Entfernen von Ausreißern und überlappenden Clustern
- * @param {Array} df - Cluster-Array
- * @param {string} startACol - Spaltenname für die Startposition in Text A
- * @param {string} endACol - Spaltenname für die Endposition in Text A
- * @param {string} startBCol - Spaltenname für die Startposition in Text B
- * @param {boolean} noLoop - Ob die Bereinigung nur einmal durchgeführt werden soll
- * @returns {Array} - Bereinigtes Array ohne Ausreißer und überlappende Cluster
+ * Cleans the cluster table by removing outliers and overlapping clusters
+ * @param {Array} df - Cluster array
+ * @param {string} startACol - Column name for the start position in Text A
+ * @param {string} endACol - Column name for the end position in Text A
+ * @param {string} startBCol - Column name for the start position in Text B
+ * @param {boolean} noLoop - Whether the cleaning should be performed only once
+ * @returns {Array} - Cleaned array without outliers and overlapping clusters
  */
 export const cleanClusterTable = (
   df, 
@@ -254,18 +254,18 @@ export const cleanClusterTable = (
   let loops = 0;
   let currentDf = [...df];
   
-  // Bereinigung fortsetzen, bis Spalte B aufsteigend ist oder Stabilisierung erreicht ist
+  // Continue cleaning until column B is ascending or stabilization is reached
   while (!isColumnAscending(currentDf, startBCol)) {
     const df2 = [...currentDf];
     currentDf = removeOverlappingClusters(currentDf, startACol, endACol, false);
     currentDf = removeOutlyingClusters(currentDf, startBCol);
     
-    // Nach einer Iteration beenden, wenn noLoop true ist
+    // End after one iteration if noLoop is true
     if (noLoop) {
       break;
     }
     
-    // Beenden, wenn keine Änderungen mehr auftreten
+    // End if no more changes occur
     if (JSON.stringify(currentDf) === JSON.stringify(df2)) {
       break;
     }
@@ -277,9 +277,9 @@ export const cleanClusterTable = (
 };
 
 /**
- * Konvertiert Cluster-Daten für die BubbleChart-Visualisierung
- * @param {Array} clusters - Die zu konvertierenden Cluster-Daten
- * @returns {Object} - Daten für ein Bubble-Chart mit Plotly
+ * Converts cluster data for the BubbleChart visualization
+ * @param {Array} clusters - The cluster data to convert
+ * @returns {Object} - Data for a bubble chart with Plotly
  */
 export const convertToBubbleChartData = (clusters) => {
   return {
@@ -295,35 +295,35 @@ export const convertToBubbleChartData = (clusters) => {
       colorscale: 'Viridis',
       showscale: true,
       colorbar: {
-        title: 'Cluster-Länge'
+        title: 'Cluster Length'
       }
     },
-    text: clusters.map(c => `Länge: ${c.length}<br>Text 1: ${c.start_text1}-${c.end_text1}<br>Text 2: ${c.start_text2}-${c.end_text2}`),
+    text: clusters.map(c => `Length: ${c.length}<br>Text 1: ${c.start_text1}-${c.end_text1}<br>Text 2: ${c.start_text2}-${c.end_text2}`),
     hoverinfo: 'text',
     type: 'scatter'
   };
 };
 
 /**
- * Vergleicht zwei Texte und organisiert deren Ähnlichkeiten und einzigartige Elemente in einer strukturierten Datenstruktur
- * @param {Array} a - Die erste Sequenz zum Vergleich
- * @param {Array} b - Die zweite Sequenz zum Vergleich
- * @param {Array} clusterArray - Ein Array mit Cluster-Informationen
- * @param {string} textAName - Der Name der ersten Sequenz für die Kennzeichnung (default: 'text1')
- * @param {string} textBName - Der Name der zweiten Sequenz für die Kennzeichnung (default: 'text2')
- * @returns {Array} - Ein Array mit strukturierten Vergleichsdaten
+ * Compares two texts and organizes their similarities and unique elements in a structured data structure
+ * @param {Array} a - The first sequence for comparison
+ * @param {Array} b - The second sequence for comparison
+ * @param {Array} clusterArray - An array with cluster information
+ * @param {string} textAName - The name of the first sequence for identification (default: 'text1')
+ * @param {string} textBName - The name of the second sequence for identification (default: 'text2')
+ * @returns {Array} - An array with structured comparison data
  */
 export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textBName = 'text2') => {
-  // Ergebnis-Array vorbereiten
+  // Prepare result array
   const comparisonResult = [];
   
   if (!a || !b || !Array.isArray(a) || !Array.isArray(b)) {
-    console.error('Ungültige Eingaben für compareTexts: a und b müssen Arrays sein');
+    console.error('Invalid inputs for compareTexts: a and b must be arrays');
     return comparisonResult;
   }
   
   if (clusterArray.length === 0) {
-    // Wenn keine Cluster vorhanden sind, Texte als einzigartig betrachten
+    // If no clusters are present, consider texts as unique
     comparisonResult.push({
       tag: 'unique',
       [`Pos_${textAName}`]: 0,
@@ -339,7 +339,7 @@ export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textB
     return comparisonResult;
   }
   
-  // Überprüfe, ob die erforderlichen Spalten in den Cluster-Daten vorhanden sind
+  // Check if the required columns are present in the cluster data
   const requiredKeys = [
     `start_${textAName}`, 
     `end_${textAName}`, 
@@ -348,25 +348,25 @@ export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textB
     'length'
   ];
   
-  // Überprüfe, ob alle erforderlichen Schlüssel im ersten Cluster-Objekt vorhanden sind
+  // Check if all required keys are present in the first cluster object
   if (!requiredKeys.every(key => key in clusterArray[0])) {
-    console.error(`Fehler: clusterArray muss Objekte mit den Eigenschaften ${requiredKeys} enthalten`);
+    console.error(`Error: clusterArray must contain objects with the properties ${requiredKeys}`);
     return comparisonResult;
   }
   
   let aStart = 0;
   let bStart = 0;
   
-  // Iteriere über alle Cluster
+  // Iterate over all clusters
   for (let clusterNr = 0; clusterNr < clusterArray.length; clusterNr++) {
-    // Cluster-Start- und Endpositionen auslesen
+    // Extract cluster start and end positions
     const startA = clusterArray[clusterNr][`start_${textAName}`];
     const endA = clusterArray[clusterNr][`end_${textAName}`];
     const startB = clusterArray[clusterNr][`start_${textBName}`];
     const endB = clusterArray[clusterNr][`end_${textBName}`];
     const length = clusterArray[clusterNr].length;
     
-    // Einzigartige Elemente hinzufügen (vor dem aktuellen Cluster)
+    // Add unique elements (before the current cluster)
     if (startA > aStart || startB > bStart) {
       comparisonResult.push({
         tag: 'unique',
@@ -381,7 +381,7 @@ export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textB
       });
     }
     
-    // Cluster hinzufügen
+    // Add cluster
     comparisonResult.push({
       tag: 'cluster',
       [`Pos_${textAName}`]: startA,
@@ -394,12 +394,12 @@ export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textB
       Cluster: a.slice(startA, endA).join('་')
     });
     
-    // Aktualisiere Start-Positionen
+    // Update start positions
     aStart = endA;
     bStart = endB;
   }
   
-  // Füge die letzten einzigartigen Elemente hinzu (nach dem letzten Cluster)
+  // Add the last unique elements (after the last cluster)
   if (aStart < a.length || bStart < b.length) {
     comparisonResult.push({
       tag: 'unique',
@@ -418,16 +418,16 @@ export const compareTexts = (a, b, clusterArray = [], textAName = 'text1', textB
 };
 
 /**
- * Konvertiert die Vergleichsdaten in einen CSV-String zum Download
- * @param {Array} comparisonData - Die Vergleichsdaten von compareTexts()
- * @returns {string} - CSV-String mit den Vergleichsdaten
+ * Converts the comparison data to a CSV string for download
+ * @param {Array} comparisonData - The comparison data from compareTexts()
+ * @returns {string} - CSV string with the comparison data
  */
 export const convertComparisonToCSV = (comparisonData, textAName = 'text1', textBName = 'text2') => {
   if (!comparisonData || comparisonData.length === 0) {
     return '';
   }
   
-  // Header-Zeile erstellen
+  // Create header row
   const headers = [
     'Tag', 
     `Pos_${textAName}`, 
@@ -442,7 +442,7 @@ export const convertComparisonToCSV = (comparisonData, textAName = 'text1', text
   
   const rows = [headers.join(',')];
   
-  // Datenzeilen erstellen
+  // Create data rows
   comparisonData.forEach(row => {
     const csvRow = [
       row.tag,
@@ -463,25 +463,25 @@ export const convertComparisonToCSV = (comparisonData, textAName = 'text1', text
 };
 
 /**
- * Konvertiert Cluster-Ergebnisse in einen CSV-String zum Download
- * @param {Array} clusters - Die Cluster-Ergebnisse
- * @param {Object} processed1 - Verarbeiteter erster Text für den Inhalt
- * @returns {string} - CSV-String mit den Cluster-Daten
+ * Converts cluster results to a CSV string for download
+ * @param {Array} clusters - The cluster results
+ * @param {Object} processed1 - Processed first text for the content
+ * @returns {string} - CSV string with the cluster data
  */
 export const convertClustersToCSV = (clusters, processed1) => {
-  const header = ['Start Text 1', 'Ende Text 1', 'Start Text 2', 'Ende Text 2', 'Länge', 'Differenz', 'Inhalt'];
+  const header = ['Start Text 1', 'End Text 1', 'Start Text 2', 'End Text 2', 'Length', 'Difference', 'Content'];
   const rows = [];
   
-  // CSV-Header
+  // CSV header
   rows.push(header.join(','));
   
-  // Datenzeilen
+  // Data rows
   for (const cluster of clusters) {
     const start1 = cluster.start_text1;
     const end1 = cluster.end_text1;
     const clusterContent = processed1.stringTokens.slice(start1, end1).join(' ');
     
-    // Anführungszeichen für den Inhalt hinzufügen, um Komma-Probleme zu vermeiden
+    // Add quotes to the content to avoid comma issues
     const escapedContent = `"${clusterContent.replace(/"/g, '""')}"`;
     
     const row = [

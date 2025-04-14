@@ -3,16 +3,16 @@ import { createRoot } from 'react-dom/client';
 import App from './components/App';
 import './app.css';
 
-// Hier starten wir die React-Anwendung, indem wir unsere Hauptkomponente (App)
-// in das root-Element rendern.
+// Here we start the React application by rendering our main component (App)
+// into the root element.
 
-// Holen wir uns das DOM-Element mit der ID "root" aus der index.html
+// Get the DOM element with the ID "root" from index.html
 const container = document.getElementById('root');
 
-// Erstellen wir eine React-Wurzel (React 18+)
+// Create a React root (React 18+)
 const root = createRoot(container);
 
-// Rendern wir unsere App-Komponente in die React-Wurzel
+// Render our App component into the React root
 root.render(
   <React.StrictMode>
     <App />

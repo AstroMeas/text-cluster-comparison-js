@@ -8,33 +8,33 @@ import {
 } from '../services/clusterService';
 
 /**
- * Custom React-Hook zur Verwaltung der Cluster-Daten und deren Verarbeitung
- * @returns {Object} Zustand und Funktionen zur Verarbeitung von Clusterdaten
+ * Custom React hook for managing cluster data and their processing
+ * @returns {Object} State and functions for processing cluster data
  */
 const useClusterData = () => {
-  // Zustand für Eingabe-Texte und deren Verarbeitung
+  // State for input texts and their processing
   const [text1, setText1] = useState('');
   const [text2, setText2] = useState('');
   const [minLength, setMinLength] = useState(5);
   const [toLowerCase, setToLowerCase] = useState(true);
   const [separators, setSeparators] = useState([' ', ',', '.', '!', '?', ';', ':', '\n', '\t']);
   
-  // Zustand für Verarbeitungsergebnisse
+  // State for processing results
   const [processed1, setProcessed1] = useState(null);
   const [processed2, setProcessed2] = useState(null);
   const [clusters, setClusters] = useState([]);
   const [isAscending, setIsAscending] = useState(true);
   
-  // Zustand für UI
+  // State for UI
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   
   /**
-   * Führt die Cluster-Analyse für die eingegebenen Texte durch
+   * Performs cluster analysis for the entered texts
    */
   const analyzeClusters = useCallback(() => {
     if (!text1.trim() || !text2.trim()) {
-      setError('Bitte gib beide Texte ein.');
+      setError('Please enter both texts.');
       return;
     }
     
@@ -42,7 +42,7 @@ const useClusterData = () => {
     setError(null);
     
     try {
-      // Verarbeite die Texte und finde Cluster
+      // Process the texts and find clusters
       const result = processTextsAndFindClusters(
         text1,
         text2,
@@ -51,60 +51,60 @@ const useClusterData = () => {
         toLowerCase
       );
       
-      // Aktualisiere den Zustand mit den Ergebnissen
+      // Update the state with the results
       setProcessed1(result.processed1);
       setProcessed2(result.processed2);
       setClusters(result.clusters);
       
-      // Prüfe, ob die start_text2-Spalte aufsteigend sortiert ist
+      // Check if the start_text2 column is sorted in ascending order
       setIsAscending(isColumnAscending(result.clusters));
       
       setIsLoading(false);
     } catch (err) {
-      console.error('Fehler bei der Cluster-Analyse:', err);
-      setError(`Fehler bei der Cluster-Analyse: ${err.message}`);
+      console.error('Error in cluster analysis:', err);
+      setError(`Error in cluster analysis: ${err.message}`);
       setIsLoading(false);
     }
   }, [text1, text2, minLength, separators, toLowerCase]);
   
   /**
-   * Bereinigt die gefundenen Cluster von Ausreißern und Überlappungen
+   * Cleans the found clusters of outliers and overlaps
    */
   const cleanClusters = useCallback(() => {
     if (clusters.length === 0) {
-      setError('Keine Cluster zum Bereinigen vorhanden.');
+      setError('No clusters available for cleaning.');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // Bereinige die Cluster-Tabelle
+      // Clean the cluster table
       const cleanedClusters = cleanClusterTable(
         clusters,
         'start_text1',
         'end_text1',
         'start_text2',
-        false // false für mehrere Durchläufe, bis alle Cluster aufsteigend sind
+        false // false for multiple iterations until all clusters are ascending
       );
       
-      // Aktualisiere den Zustand mit den bereinigten Clustern
+      // Update the state with the cleaned clusters
       setClusters(cleanedClusters);
       
-      // Prüfe erneut, ob die start_text2-Spalte aufsteigend sortiert ist
+      // Check again if the start_text2 column is sorted in ascending order
       setIsAscending(isColumnAscending(cleanedClusters));
       
       setIsLoading(false);
     } catch (err) {
-      console.error('Fehler beim Bereinigen der Cluster:', err);
-      setError(`Fehler beim Bereinigen der Cluster: ${err.message}`);
+      console.error('Error cleaning clusters:', err);
+      setError(`Error cleaning clusters: ${err.message}`);
       setIsLoading(false);
     }
   }, [clusters]);
   
   /**
-   * Bereitet Daten für ein Bubble-Chart vor
-   * @returns {Object} - Daten für ein Bubble-Chart mit Plotly
+   * Prepares data for a bubble chart
+   * @returns {Object} - Data for a bubble chart with Plotly
    */
   const getBubbleChartData = useCallback(() => {
     if (clusters.length === 0) return null;
@@ -112,45 +112,45 @@ const useClusterData = () => {
   }, [clusters]);
   
   /**
-   * Lädt die Cluster-Ergebnisse als CSV-Datei herunter
+   * Downloads the cluster results as a CSV file
    */
   const downloadClustersCSV = useCallback(() => {
     if (clusters.length === 0 || !processed1) {
-      setError('Keine Cluster zum Herunterladen vorhanden.');
+      setError('No clusters available for download.');
       return;
     }
     
     try {
-      // Konvertiere Cluster zu CSV
+      // Convert clusters to CSV
       const csvData = convertClustersToCSV(clusters, processed1);
       
-      // Erstelle einen Blob aus den CSV-Daten
+      // Create a blob from the CSV data
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       
-      // Erstelle einen temporären Link zum Herunterladen
+      // Create a temporary link for download
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'cluster_ergebnisse.csv');
+      link.setAttribute('download', 'cluster_results.csv');
       link.style.display = 'none';
       
       document.body.appendChild(link);
       link.click();
       
-      // Aufräumen
+      // Cleanup
       setTimeout(() => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }, 100);
     } catch (err) {
-      console.error('Fehler beim Herunterladen der CSV-Datei:', err);
-      setError(`Fehler beim Herunterladen: ${err.message}`);
+      console.error('Error downloading CSV file:', err);
+      setError(`Error downloading: ${err.message}`);
     }
   }, [clusters, processed1]);
   
   /**
-   * Fügt ein neues Trennzeichen zur Liste hinzu
-   * @param {string} separator - Das hinzuzufügende Trennzeichen
+   * Adds a new separator to the list
+   * @param {string} separator - The separator to add
    */
   const addSeparator = useCallback((separator) => {
     if (separator && !separators.includes(separator)) {
@@ -159,15 +159,15 @@ const useClusterData = () => {
   }, [separators]);
   
   /**
-   * Entfernt ein Trennzeichen aus der Liste
-   * @param {number} index - Der Index des zu entfernenden Trennzeichens
+   * Removes a separator from the list
+   * @param {number} index - The index of the separator to remove
    */
   const removeSeparator = useCallback((index) => {
     setSeparators(prev => prev.filter((_, i) => i !== index));
   }, []);
   
   return {
-    // Zustände
+    // States
     text1,
     text2,
     minLength,
@@ -180,13 +180,13 @@ const useClusterData = () => {
     isLoading,
     error,
     
-    // Setter-Funktionen
+    // Setter functions
     setText1,
     setText2,
     setMinLength,
     setToLowerCase,
     
-    // Aktionsfunktionen
+    // Action functions
     analyzeClusters,
     cleanClusters,
     getBubbleChartData,

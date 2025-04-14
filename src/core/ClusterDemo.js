@@ -1,7 +1,7 @@
 import { clusterPreprocess } from './preprocessing.js';
 import { findClusters } from './clusterSearch.js';
 
-// DOM-Elemente für die Cluster-Demo
+// DOM elements for the cluster demo
 const text1Element = document.getElementById('text1');
 const text2Element = document.getElementById('text2');
 const minLengthInput = document.getElementById('minLength');
@@ -12,22 +12,22 @@ const separatorListElement = document.getElementById('separatorList');
 const clusterButton = document.getElementById('findClustersButton');
 const resultElement = document.getElementById('clusterResults');
 
-// Standard-Trennzeichen
+// Default separators
 let separators = [' ', ',', '.', '!', '?', ';', ':', '\n', '\t'];
-// Globale Variable für Cluster und verarbeitete Texte
+// Global variables for clusters and processed texts
 let globalClusters = [];
 let globalProcessed1 = null;
 let globalProcessed2 = null;
 
-// Event-Listener hinzufügen
+// Add event listeners
 clusterButton.addEventListener('click', findTextClusters);
 addSeparatorButton.addEventListener('click', addSeparator);
 
-// Initiale Darstellung der Trennzeichen
+// Initial display of separators
 updateSeparatorList();
 
 /**
- * Fügt ein neues Trennzeichen zur Liste hinzu
+ * Adds a new separator to the list
  */
 function addSeparator() {
   const separator = separatorInput.value;
@@ -40,8 +40,8 @@ function addSeparator() {
 }
 
 /**
- * Entfernt ein Trennzeichen aus der Liste
- * @param {number} index - Index des zu entfernenden Trennzeichens
+ * Removes a separator from the list
+ * @param {number} index - Index of the separator to remove
  */
 function removeSeparator(index) {
   separators.splice(index, 1);
@@ -49,7 +49,7 @@ function removeSeparator(index) {
 }
 
 /**
- * Aktualisiert die Anzeige der Trennzeichenliste
+ * Updates the display of the separator list
  */
 function updateSeparatorList() {
   separatorListElement.innerHTML = '';
@@ -58,9 +58,9 @@ function updateSeparatorList() {
     const item = document.createElement('div');
     item.className = 'separator-item';
     
-    // Leerzeichen besonders darstellen
-    const displayText = separator === ' ' ? '␣ (Leerzeichen)' : 
-                        separator === '\n' ? '↵ (Zeilenumbruch)' :
+    // Display special characters differently
+    const displayText = separator === ' ' ? '␣ (Space)' : 
+                        separator === '\n' ? '↵ (Line Break)' :
                         separator === '\t' ? '→ (Tab)' : separator;
     
     item.innerHTML = `
@@ -68,7 +68,7 @@ function updateSeparatorList() {
       <button class="remove-separator" data-index="${index}">×</button>
     `;
     
-    // Event-Listener für den Entfernen-Button
+    // Event listener for the remove button
     const removeButton = item.querySelector('.remove-separator');
     removeButton.addEventListener('click', () => removeSeparator(index));
     
@@ -77,88 +77,88 @@ function updateSeparatorList() {
 }
 
 /**
- * Hauptfunktion zum Finden von Clustern zwischen zwei Texten
+ * Main function for finding clusters between two texts
  */
 function findTextClusters() {
   const text1 = text1Element.value;
   const text2 = text2Element.value;
   
   if (!text1.trim() || !text2.trim()) {
-    resultElement.textContent = 'Bitte gib beide Texte ein.';
+    resultElement.textContent = 'Please enter both texts.';
     return;
   }
   
-  // Mindestlänge für Cluster aus dem Input-Feld holen
+  // Get minimum length for clusters from the input field
   const minLength = parseInt(minLengthInput.value) || 5;
   
-  // Einstellungen für die Vorverarbeitung
+  // Settings for preprocessing
   const preprocessOptions = {
     toLowerCase: toLowerCaseCheckbox.checked,
     separators: separators
   };
   
-  // Texte vorverarbeiten
+  // Preprocess texts
   const processed1 = clusterPreprocess(text1, preprocessOptions);
   const processed2 = clusterPreprocess(text2, preprocessOptions);
   
-  // Globale Variablen speichern
+  // Save global variables
   globalProcessed1 = processed1;
   globalProcessed2 = processed2;
   
-  // Cluster finden
+  // Find clusters
   try {
     const clusters = findClusters(processed1, processed2, minLength, 'text1', 'text2');
     globalClusters = clusters;
     displayClusters(clusters, text1, text2, processed1, processed2);
   } catch (error) {
-    resultElement.textContent = `Fehler beim Clustervergleich: ${error.message}`;
+    resultElement.textContent = `Error during cluster comparison: ${error.message}`;
   }
 }
 
 /**
- * Zeigt die gefundenen Cluster im Ergebnisbereich an
- * @param {Array} clusters - Die gefundenen Cluster
- * @param {string} text1 - Der erste Text
- * @param {string} text2 - Der zweite Text
- * @param {Object} processed1 - Verarbeiteter erster Text
- * @param {Object} processed2 - Verarbeiteter zweiter Text
+ * Displays the found clusters in the results area
+ * @param {Array} clusters - The found clusters
+ * @param {string} text1 - The first text
+ * @param {string} text2 - The second text
+ * @param {Object} processed1 - Processed first text
+ * @param {Object} processed2 - Processed second text
  */
 function displayClusters(clusters, text1, text2, processed1, processed2) {
   if (clusters.length === 0) {
-    resultElement.innerHTML = '<p>Keine Cluster gefunden, die der Mindestlänge entsprechen.</p>';
+    resultElement.innerHTML = '<p>No clusters found that meet the minimum length.</p>';
     return;
   }
   
-  // Überprüfen, ob die start_text2 Spalte aufsteigend ist
+  // Check if the start_text2 column is in ascending order
   const isAscending = isColumnAscending(clusters, 'start_text2');
   
-  let html = `<h3>Gefundene Cluster (${clusters.length})</h3>`;
+  let html = `<h3>Found Clusters (${clusters.length})</h3>`;
   
-  // Anzeigen, ob die Spalte aufsteigend ist
-  html += `<p>Cluster ${isAscending ? '<span style="color: green;">sind aufsteigend sortiert</span>' : 
-    '<span style="color: red;">die nicht in das Muster gefunden. Text 2 ist nicht aufsteigend sortiert</span>'}</p>`;
+  // Show whether the column is in ascending order
+  html += `<p>Clusters ${isAscending ? '<span style="color: green;">are sorted in ascending order</span>' : 
+    '<span style="color: red;">are not in the pattern. Text 2 is not sorted in ascending order</span>'}</p>`;
   
-  // Button zum Bereinigen der Cluster anzeigen, wenn sie nicht aufsteigend sind
+  // Show button to clean clusters if they are not in ascending order
   if (!isAscending) {
     html += '<div style="margin-bottom: 15px;">';
-    html += '<button id="cleanClustersButton" class="clean-button">Ausreißer-Cluster entfernen</button>';
+    html += '<button id="cleanClustersButton" class="clean-button">Remove Outlier Clusters</button>';
     html += '</div>';
   }
   
   html += '<table class="cluster-table">';
   html += '<thead><tr>';
   html += '<th>Start Text 1</th>';
-  html += '<th>Ende Text 1</th>';
+  html += '<th>End Text 1</th>';
   html += '<th>Start Text 2</th>';
-  html += '<th>Ende Text 2</th>';
-  html += '<th>Länge</th>';
-  html += '<th>Differenz</th>';
-  html += '<th>Inhalt</th>';
+  html += '<th>End Text 2</th>';
+  html += '<th>Length</th>';
+  html += '<th>Difference</th>';
+  html += '<th>Content</th>';
   html += '</tr></thead>';
   html += '<tbody>';
   
   for (const cluster of clusters) {
-    // Originalen Text für den Cluster abrufen
+    // Get original text for the cluster
     const start1 = cluster.start_text1;
     const end1 = cluster.end_text1;
     const clusterContent = processed1.stringTokens.slice(start1, end1).join(' ');
@@ -176,19 +176,19 @@ function displayClusters(clusters, text1, text2, processed1, processed2) {
   
   html += '</tbody></table>';
   
-  // Download-Button hinzufügen
+  // Add download button
   html += '<div style="margin-top: 20px;">';
-  html += '<button id="downloadButton">Ergebnisse herunterladen</button>';
+  html += '<button id="downloadButton">Download Results</button>';
   html += '</div>';
   
   resultElement.innerHTML = html;
   
-  // Event-Listener für den Download-Button hinzufügen
+  // Add event listener for the download button
   document.getElementById('downloadButton').addEventListener('click', () => {
     downloadClusterResults(clusters, processed1);
   });
   
-  // Event-Listener für den Bereinigen-Button hinzufügen, wenn er existiert
+  // Add event listener for the clean button if it exists
   const cleanButton = document.getElementById('cleanClustersButton');
   if (cleanButton) {
     cleanButton.addEventListener('click', cleanAndDisplayClusters);
@@ -196,10 +196,10 @@ function displayClusters(clusters, text1, text2, processed1, processed2) {
 }
 
 /**
- * Überprüft, ob die Werte in einer Spalte aufsteigend sortiert sind
- * @param {Array} clusters - Die Cluster-Liste
- * @param {string} columnName - Der Name der zu überprüfenden Spalte
- * @returns {boolean} - True, wenn die Spalte aufsteigend sortiert ist
+ * Checks if the values in a column are in ascending order
+ * @param {Array} clusters - The cluster list
+ * @param {string} columnName - The name of the column to check
+ * @returns {boolean} - True if the column is in ascending order
  */
 function isColumnAscending(clusters, columnName) {
   if (clusters.length <= 1) return true;
@@ -214,18 +214,18 @@ function isColumnAscending(clusters, columnName) {
 }
 
 /**
- * Entfernt Ausreißer-Cluster basierend auf Positionssprüngen in Text B
- * @param {Array} clusters - Die Cluster-Array
- * @param {string} textBStartCol - Spaltenname für die Startposition in Text B (default: 'start_text2')
- * @returns {Array} - Gefiltertes Array ohne Ausreißer-Cluster
+ * Removes outlier clusters based on position jumps in Text B
+ * @param {Array} clusters - The cluster array
+ * @param {string} textBStartCol - Column name for the start position in Text B (default: 'start_text2')
+ * @returns {Array} - Filtered array without outlier clusters
  */
 function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
   if (clusters.length <= 1) return clusters;
   
-  // Kopie des Cluster-Arrays erstellen
+  // Create a copy of the cluster array
   const df = [...clusters];
   
-  // Differenzen zwischen aufeinanderfolgenden Startpositionen berechnen
+  // Calculate differences between consecutive start positions
   const diffs = [];
   const flags = [];
   
@@ -238,36 +238,36 @@ function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
     flags.push(0);
   }
   
-  // Zeilen mit negativen Differenzen markieren (potenzielle Ausreißer)
+  // Mark rows with negative differences (potential outliers)
   for (let i = 0; i < diffs.length; i++) {
     if (diffs[i] !== null && diffs[i] < 0) {
       flags[i] = 1;
-      // Auch die vorherige Zeile markieren
+      // Also mark the previous row
       if (i > 0) {
         flags[i-1] = 1;
       }
     }
   }
   
-  // Array zum Markieren von zu entfernenden Zeilen
+  // Array to mark rows for removal
   const removeIndexes = new Array(df.length).fill(0);
   
-  // Jede Zeile verarbeiten, um Ausreißer zu identifizieren
+  // Process each row to identify outliers
   for (let i = 0; i < df.length; i++) {
-    // Erste Zeile überspringen
+    // Skip first row
     if (i === 0) continue;
     
-    // Letzten Zeilenfalls behandeln
+    // Handle last row case
     if (i + 1 === df.length && flags[i] === 1) {
       removeIndexes[i] = 1;
       continue;
     }
     
-    // Aufeinanderfolgende markierte Zeilen überprüfen
+    // Check consecutive marked rows
     if (flags[i] === 1 && flags[i-1] === 1) {
       let offset = 1;
       
-      // Nach passender Grenze suchen
+      // Look for suitable boundary
       while ((i - offset) > 0 && (i + offset + 1) < df.length) {
         if (df[i][textBStartCol] > df[i-offset-1][textBStartCol] || 
             df[i-1][textBStartCol] < df[i+offset][textBStartCol]) {
@@ -277,7 +277,7 @@ function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
         }
       }
       
-      // Zeilen basierend auf erkanntem Muster zur Entfernung markieren
+      // Mark rows for removal based on identified pattern
       if (df[i-1][textBStartCol] <= df[i+offset][textBStartCol]) {
         for (let j = i; j < i + offset; j++) {
           removeIndexes[j] = 1;
@@ -287,12 +287,12 @@ function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
           removeIndexes[j] = 1;
         }
       } else {
-        console.log(`Problem bei Index ${i}`);
+        console.log(`Problem at index ${i}`);
       }
     }
   }
   
-  // Zeilen vom Ende her verarbeiten, um nachlaufende Ausreißer zu entfernen
+  // Process rows from the end to remove trailing outliers
   for (let i = df.length - 1; i > 0; i--) {
     if (flags[i] === 1) {
       removeIndexes[i] = 1;
@@ -301,7 +301,7 @@ function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
     }
   }
   
-  // Indizes zum Entfernen erhalten
+  // Get indices to remove
   const dropIndices = [];
   for (let i = 0; i < removeIndexes.length; i++) {
     if (removeIndexes[i] === 1) {
@@ -309,12 +309,12 @@ function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
     }
   }
   
-  console.log("Entferne Indizes:", dropIndices);
+  console.log("Removing indices:", dropIndices);
   
-  // Identifizierte Ausreißer entfernen
+  // Remove identified outliers
   const result = df.filter((_, index) => !dropIndices.includes(index));
   
-  // Duplikate entfernen (gleiche Startposition in Text B)
+  // Remove duplicates (same start position in Text B)
   const uniqueResult = [];
   const seen = new Set();
   
@@ -325,92 +325,92 @@ function removeOutlyingClusters(clusters, textBStartCol = 'start_text2') {
     uniqueResult.push(result[i]);
   }
   
-  console.log(`${df.length - uniqueResult.length} Cluster entfernt`);
+  console.log(`${df.length - uniqueResult.length} clusters removed`);
   
   return uniqueResult;
 }
 
 /**
- * Entfernt überlappende Cluster in Text A
- * @param {Array} clusterDf - Cluster-Array
- * @param {string} startACol - Spaltenname für die Startposition in Text A (default: 'start_text1')
- * @param {string} endACol - Spaltenname für die Endposition in Text A (default: 'end_text1')
- * @param {boolean} verbose - Ob Informationen über entfernte Zeilen ausgegeben werden sollen (default: false)
- * @returns {Array} - Gefiltertes Array ohne überlappende Cluster
+ * Removes overlapping clusters in Text A
+ * @param {Array} clusterDf - Cluster array
+ * @param {string} startACol - Column name for the start position in Text A (default: 'start_text1')
+ * @param {string} endACol - Column name for the end position in Text A (default: 'end_text1')
+ * @param {boolean} verbose - Whether to output information about removed rows (default: false)
+ * @returns {Array} - Filtered array without overlapping clusters
  */
 function removeOverlappingClusters(clusterDf, startACol = 'start_text1', endACol = 'end_text1', verbose = false) {
-  // Eine Kopie des Eingabe-Arrays erstellen
+  // Create a copy of the input array
   const df = [...clusterDf];
   
-  // Anfängliche Anzahl der Cluster
+  // Initial number of clusters
   const initialCount = df.length;
   
-  // Sicherstellen, dass das Array nach start_a sortiert ist
+  // Ensure the array is sorted by start_a
   df.sort((a, b) => a[startACol] - b[startACol]);
   
-  // Array für gültige Zeilen (nicht überlappend)
+  // Array for valid rows (non-overlapping)
   const validRows = new Array(df.length).fill(true);
   
-  // Vorheriger end_a-Wert
+  // Previous end_a value
   let prevEndA = null;
   
-  // Jede Zeile auf Überlappung mit vorheriger prüfen
+  // Check each row for overlap with previous
   for (let idx = 0; idx < df.length; idx++) {
     const currentStartA = df[idx][startACol];
     
-    // Erste Zeile überspringen
+    // Skip first row
     if (prevEndA !== null) {
-      // Wenn aktueller start_a kleiner als vorheriger end_a ist, als ungültig markieren
+      // If current start_a is less than previous end_a, mark as invalid
       if (currentStartA < prevEndA) {
         validRows[idx] = false;
       }
     }
     
-    // Vorherigen end_a aktualisieren
+    // Update previous end_a
     prevEndA = df[idx][endACol];
   }
   
-  // Die Maske anwenden, um überlappende Zeilen zu filtern
+  // Apply the mask to filter overlapping rows
   const filteredDf = df.filter((_, i) => validRows[i]);
   
-  // Anzahl der entfernten Zeilen
+  // Number of removed rows
   const removedCount = initialCount - filteredDf.length;
   
-  // Zusammenfassung ausgeben, wenn verbose
+  // Output summary if verbose
   if (verbose) {
-    console.log(`Anfängliche Cluster: ${initialCount}`);
-    console.log(`Überlappende Cluster entfernt: ${removedCount}`);
-    console.log(`Verbleibende Cluster: ${filteredDf.length}`);
+    console.log(`Initial clusters: ${initialCount}`);
+    console.log(`Overlapping clusters removed: ${removedCount}`);
+    console.log(`Remaining clusters: ${filteredDf.length}`);
   }
   
   return filteredDf;
 }
 
 /**
- * Bereinigt die Cluster-Tabelle durch Entfernen von Ausreißern und überlappenden Clustern
- * @param {Array} df - Cluster-Array
- * @param {string} startACol - Spaltenname für die Startposition in Text A
- * @param {string} endACol - Spaltenname für die Endposition in Text A
- * @param {string} startBCol - Spaltenname für die Startposition in Text B
- * @param {boolean} noLoop - Ob die Bereinigung nur einmal durchgeführt werden soll (true) oder in einer Schleife (false)
- * @returns {Array} - Bereinigtes Array ohne Ausreißer und überlappende Cluster
+ * Cleans the cluster table by removing outliers and overlapping clusters
+ * @param {Array} df - Cluster array
+ * @param {string} startACol - Column name for the start position in Text A
+ * @param {string} endACol - Column name for the end position in Text A
+ * @param {string} startBCol - Column name for the start position in Text B
+ * @param {boolean} noLoop - Whether to perform the cleaning only once (true) or in a loop (false)
+ * @returns {Array} - Cleaned array without outliers and overlapping clusters
  */
 function cleanClusterTable(df, startACol, endACol, startBCol, noLoop = true) {
   let loops = 0;
   let currentDf = [...df];
   
-  // Bereinigung fortsetzen, bis Spalte B aufsteigend ist oder Stabilisierung erreicht ist
+  // Continue cleaning until column B is ascending or stabilization is reached
   while (!isColumnAscending(currentDf, startBCol)) {
     const df2 = [...currentDf];
     currentDf = removeOverlappingClusters(currentDf, startACol, endACol, false);
     currentDf = removeOutlyingClusters(currentDf, startBCol);
     
-    // Nach einer Iteration beenden, wenn noLoop true ist
+    // End after one iteration if noLoop is true
     if (noLoop) {
       break;
     }
     
-    // Beenden, wenn keine Änderungen mehr auftreten
+    // End if no more changes occur
     if (JSON.stringify(currentDf) === JSON.stringify(df2)) {
       break;
     }
@@ -418,23 +418,23 @@ function cleanClusterTable(df, startACol, endACol, startBCol, noLoop = true) {
     loops++;
   }
   
-  // Endgültiges Ergebnis prüfen
+  // Check final result
   const asc = isColumnAscending(currentDf, startBCol);
-  console.log(`Nur aufsteigend? ${asc} nach ${loops} Durchläufen`);
+  console.log(`Only ascending? ${asc} after ${loops} iterations`);
   
   return currentDf;
 }
 
 /**
- * Bereinigt die aktuellen Cluster und zeigt sie erneut an
+ * Cleans the current clusters and displays them again
  */
 function cleanAndDisplayClusters() {
   if (!globalClusters || globalClusters.length === 0) {
-    console.warn("Keine Cluster zum Bereinigen verfügbar");
+    console.warn("No clusters available for cleaning");
     return;
   }
   
-  // Cluster bereinigen
+  // Clean clusters
   const cleanedClusters = cleanClusterTable(
     globalClusters, 
     'start_text1', 
@@ -443,10 +443,10 @@ function cleanAndDisplayClusters() {
     false
   );
   
-  // Globale Variable aktualisieren
+  // Update global variable
   globalClusters = cleanedClusters;
   
-  // Bereinigte Cluster anzeigen
+  // Display cleaned clusters
   displayClusters(
     cleanedClusters, 
     text1Element.value, 
@@ -457,25 +457,25 @@ function cleanAndDisplayClusters() {
 }
 
 /**
- * Konvertiert Cluster-Ergebnisse in einen CSV-String
- * @param {Array} clusters - Die Cluster-Ergebnisse
- * @param {Object} processed1 - Verarbeiteter erster Text für den Inhalt
- * @returns {string} - CSV-String mit den Cluster-Daten
+ * Converts cluster results to a CSV string
+ * @param {Array} clusters - The cluster results
+ * @param {Object} processed1 - Processed first text for the content
+ * @returns {string} - CSV string with the cluster data
  */
 function convertClustersToCSV(clusters, processed1) {
-  const header = ['Start Text 1', 'Ende Text 1', 'Start Text 2', 'Ende Text 2', 'Länge', 'Differenz', 'Inhalt'];
+  const header = ['Start Text 1', 'End Text 1', 'Start Text 2', 'End Text 2', 'Length', 'Difference', 'Content'];
   const rows = [];
   
-  // CSV-Header
+  // CSV header
   rows.push(header.join(','));
   
-  // Datenzeilen
+  // Data rows
   for (const cluster of clusters) {
     const start1 = cluster.start_text1;
     const end1 = cluster.end_text1;
     const clusterContent = processed1.stringTokens.slice(start1, end1).join(' ');
     
-    // Anführungszeichen für den Inhalt hinzufügen, um Komma-Probleme zu vermeiden
+    // Add quotes to content to avoid comma issues
     const escapedContent = `"${clusterContent.replace(/"/g, '""')}"`;
     
     const row = [
@@ -495,35 +495,35 @@ function convertClustersToCSV(clusters, processed1) {
 }
 
 /**
- * Lädt die Cluster-Ergebnisse als CSV-Datei herunter
- * @param {Array} clusters - Die Cluster-Ergebnisse
- * @param {Object} processed1 - Verarbeiteter erster Text für den Inhalt
+ * Downloads the cluster results as a CSV file
+ * @param {Array} clusters - The cluster results
+ * @param {Object} processed1 - Processed first text for the content
  */
 function downloadClusterResults(clusters, processed1) {
-  // CSV-Daten erstellen
+  // Create CSV data
   const csvData = convertClustersToCSV(clusters, processed1);
   
-  // Blob erstellen
+  // Create blob
   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
   
-  // URL für den Blob erstellen
+  // Create URL for the blob
   const url = URL.createObjectURL(blob);
   
-  // Temporären Link erstellen und klicken
+  // Create temporary link and click
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'cluster_ergebnisse.csv');
+  link.setAttribute('download', 'cluster_results.csv');
   link.style.display = 'none';
   
   document.body.appendChild(link);
   link.click();
   
-  // Aufräumen
+  // Cleanup
   setTimeout(() => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   }, 100);
 }
 
-// Konsolenausgabe zur Bestätigung, dass das Skript geladen wurde
-console.log('Cluster Demo geladen');
+// Console output to confirm that the script has loaded
+console.log('Cluster Demo loaded');

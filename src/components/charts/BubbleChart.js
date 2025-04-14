@@ -2,27 +2,27 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 
 /**
- * BubbleChart-Komponente zur Visualisierung von Cluster-Positionen
+ * BubbleChart component for visualizing cluster positions
  * 
- * @param {Object} props - Komponenten-Properties
- * @param {Object} props.data - Vorbereitete Daten für das Bubble-Chart
- * @param {string} props.title - Titel des Diagramms
- * @param {Object} props.layout - Zusätzliche Layout-Optionen (optional)
+ * @param {Object} props - Component properties
+ * @param {Object} props.data - Prepared data for the bubble chart
+ * @param {string} props.title - Title of the diagram
+ * @param {Object} props.layout - Additional layout options (optional)
  */
 const BubbleChart = ({ data, title, layout = {} }) => {
-  // Wenn keine Daten vorhanden sind, zeige eine Meldung an
+  // If no data is available, display a message
   if (!data) {
     return (
       <div className="card">
-        <div className="card-title">Bubble-Chart</div>
-        <p>Keine Daten für die Visualisierung verfügbar.</p>
+        <div className="card-title">Bubble Chart</div>
+        <p>No data available for visualization.</p>
       </div>
     );
   }
   
-  // Standard-Layout für das Diagramm
+  // Default layout for the diagram
   const defaultLayout = {
-    title: title || 'Cluster-Positionen (Bubble-Chart)',
+    title: title || 'Cluster Positions (Bubble Chart)',
     xaxis: {
       title: 'Position in Text 1',
       zeroline: false,
@@ -47,10 +47,10 @@ const BubbleChart = ({ data, title, layout = {} }) => {
     }
   };
   
-  // Zusammenführen des Standard-Layouts mit den übergebenen Layout-Optionen
+  // Merge the default layout with the provided layout options
   const mergedLayout = { ...defaultLayout, ...layout };
   
-  // Konfiguration für Interaktivität und Download-Optionen
+  // Configuration for interactivity and download options
   const config = {
     responsive: true,
     displayModeBar: true,

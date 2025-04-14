@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +36,7 @@
         button:hover {
             background-color: #45a049;
         }
-        /* Neuer Style für Clean-Button */
+        /* New style for clean button */
         .clean-button {
             background-color: #ff9800;
             color: white;
@@ -104,48 +104,48 @@
     <div class="text-container">
         <div class="text-box">
             <h2>Text 1</h2>
-            <textarea id="text1">Dies ist ein Beispieltext. Dieser Text wird mit dem zweiten Text verglichen, um ähnliche Textabschnitte zu finden.</textarea>
+            <textarea id="text1">This is a sample text. This text will be compared with the second text to find similar text sections.</textarea>
         </div>
         
         <div class="text-box">
             <h2>Text 2</h2>
-            <textarea id="text2">Dies ist ein anderer Text zum Vergleich. Dieser Text enthält einen ähnlichen Abschnitt wie der erste Text, nämlich "um ähnliche Textabschnitte zu finden".</textarea>
+            <textarea id="text2">This is another text for comparison. This text contains a similar section to the first text, namely "to find similar text sections".</textarea>
         </div>
     </div>
     
     <div class="options-grid">
         <div>
-            <h3>Cluster-Optionen</h3>
+            <h3>Cluster Options</h3>
             <div>
-                <label for="minLength">Minimale Cluster-Länge:</label>
+                <label for="minLength">Minimum Cluster Length:</label>
                 <input type="number" id="minLength" value="5" min="1">
             </div>
 
             <div style="margin-top: 10px;">
                 <label for="toLowerCase">
-                    <input type="checkbox" id="toLowerCase" checked> Text in Kleinbuchstaben umwandeln
+                    <input type="checkbox" id="toLowerCase" checked> Convert text to lowercase
                 </label>
             </div>
         </div>
         
         <div>
-            <h3>Trennzeichen</h3>
+            <h3>Separators</h3>
             <div>
-                <input type="text" id="separatorInput" placeholder="Trennzeichen" style="width: 100px">
-                <button id="addSeparatorButton">Hinzufügen</button>
+                <input type="text" id="separatorInput" placeholder="Separator" style="width: 100px">
+                <button id="addSeparatorButton">Add</button>
             </div>
             <div id="separatorList" class="separator-list">
-                <!-- Trennzeichen werden hier angezeigt -->
+                <!-- Separators will be displayed here -->
             </div>
         </div>
     </div>
     
     <div style="margin-top: 20px;">
-        <button id="findClustersButton">Cluster finden</button>
+        <button id="findClustersButton">Find Clusters</button>
     </div>
     
     <div id="clusterResults" style="margin-top: 20px;">
-        <p>Cluster-Ergebnisse werden hier angezeigt...</p>
+        <p>Cluster results will be displayed here...</p>
     </div>
     
     <script type="module" src="clusterdemo.js"></script>

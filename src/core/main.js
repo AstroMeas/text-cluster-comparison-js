@@ -1,7 +1,7 @@
 // main.js
 import { replaceChars, convertToList, clusterPreprocess, TextPreprocessor } from './preprocessing.js';
 
-// DOM-Elemente
+// DOM elements
 const inputTextElement = document.getElementById('inputText');
 const toLowerCaseCheckbox = document.getElementById('toLowerCase');
 const originalCharInput = document.getElementById('originalChar');
@@ -14,19 +14,19 @@ const separatorListElement = document.getElementById('separatorList');
 const processButton = document.getElementById('processButton');
 const outputResultElement = document.getElementById('outputResult');
 
-// Datenstrukturen für Benutzereinstellungen
+// Data structures for user settings
 let replacements = [];
 let separators = [' ', ',', '.'];
 
-// Standard-Separatoren anzeigen
+// Display default separators
 updateSeparatorsList();
 
-// Event-Listener für Buttons
+// Event listeners for buttons
 addReplacementButton.addEventListener('click', addReplacement);
 addSeparatorButton.addEventListener('click', addSeparator);
 processButton.addEventListener('click', processText);
 
-// Funktion zum Hinzufügen einer Zeichenersetzung
+// Function to add a character replacement
 function addReplacement() {
     const original = originalCharInput.value;
     const replacement = replacementCharInput.value;
@@ -39,7 +39,7 @@ function addReplacement() {
     }
 }
 
-// Funktion zum Hinzufügen eines Trennzeichens
+// Function to add a separator
 function addSeparator() {
     const separator = separatorInput.value;
     
@@ -50,7 +50,7 @@ function addSeparator() {
     }
 }
 
-// Aktualisiert die Anzeige der Ersetzungsliste
+// Updates the display of the replacement list
 function updateReplacementsList() {
     replacementListElement.innerHTML = '';
     
@@ -58,12 +58,12 @@ function updateReplacementsList() {
         const item = document.createElement('div');
         item.innerHTML = `
             <span>${replacement[0]} → ${replacement[1]}</span>
-            <button class="remove-btn" data-type="replacement" data-index="${index}">Entfernen</button>
+            <button class="remove-btn" data-type="replacement" data-index="${index}">Remove</button>
         `;
         replacementListElement.appendChild(item);
     });
     
-    // Event-Listener für Entfernen-Buttons
+    // Event listeners for remove buttons
     document.querySelectorAll('.remove-btn[data-type="replacement"]').forEach(button => {
         button.addEventListener('click', function() {
             const index = parseInt(this.getAttribute('data-index'));
@@ -73,22 +73,22 @@ function updateReplacementsList() {
     });
 }
 
-// Aktualisiert die Anzeige der Trennzeichenliste
+// Updates the display of the separator list
 function updateSeparatorsList() {
     separatorListElement.innerHTML = '';
     
     separators.forEach((separator, index) => {
         const item = document.createElement('div');
-        const displayText = separator === ' ' ? '␣ (Leerzeichen)' : separator;
+        const displayText = separator === ' ' ? '␣ (Space)' : separator;
         
         item.innerHTML = `
             <span>${displayText}</span>
-            <button class="remove-btn" data-type="separator" data-index="${index}">Entfernen</button>
+            <button class="remove-btn" data-type="separator" data-index="${index}">Remove</button>
         `;
         separatorListElement.appendChild(item);
     });
     
-    // Event-Listener für Entfernen-Buttons
+    // Event listeners for remove buttons
     document.querySelectorAll('.remove-btn[data-type="separator"]').forEach(button => {
         button.addEventListener('click', function() {
             const index = parseInt(this.getAttribute('data-index'));
@@ -98,28 +98,28 @@ function updateSeparatorsList() {
     });
 }
 
-// Hauptfunktion zur Textverarbeitung
+// Main function for text processing
 function processText() {
     const inputText = inputTextElement.value;
     
     if (!inputText.trim()) {
-        outputResultElement.textContent = 'Bitte gib einen Text ein.';
+        outputResultElement.textContent = 'Please enter a text.';
         return;
     }
     
-    // Erstelle einen TextPreprocessor mit den Benutzereinstellungen
+    // Create a TextPreprocessor with user settings
     const preprocessor = new TextPreprocessor({
         separators: separators,
         charsToReplace: replacements,
         toLowerCase: toLowerCaseCheckbox.checked
     });
     
-    // Verarbeite den Text
+    // Process the text
     const tokens = preprocessor.process(inputText);
     
-    // Zeige das Ergebnis an
+    // Display the result
     outputResultElement.textContent = JSON.stringify(tokens, null, 2);
 }
 
-// Konsolenausgabe zur Bestätigung, dass das Skript geladen wurde
-console.log('Text Preprocessing Demo geladen');
+// Console output to confirm that the script has loaded
+console.log('Text Preprocessing Demo loaded');

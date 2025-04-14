@@ -2,20 +2,20 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  // Der Einstiegspunkt unserer Anwendung
+  // The entry point of our application
   entry: './src/index.js',
   
-  // Ausgabepfad für die gebündelte Anwendung
+  // Output path for the bundled application
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     publicPath: '/text-cluster-comparison-js/'
   },
   
-  // Regeln für das Laden verschiedener Dateitypen
+  // Rules for loading different file types
   module: {
     rules: [
-      // JavaScript und JSX-Dateien mit Babel transpilieren
+      // Transpile JavaScript and JSX files with Babel
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
@@ -23,12 +23,12 @@ module.exports = {
           loader: 'babel-loader'
         }
       },
-      // CSS-Dateien laden
+      // Load CSS files
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
       },
-      // Bilder und andere Dateien laden
+      // Load images and other files
       {
         test: /\.(png|svg|jpg|gif|ico)$/,
         use: ['file-loader']
@@ -36,21 +36,21 @@ module.exports = {
     ]
   },
   
-  // Resolve-Einstellungen, damit wir Dateien ohne Endungen importieren können
+  // Resolve settings, so we can import files without extensions
   resolve: {
     extensions: ['.js', '.jsx']
   },
   
-  // Der Dev-Server für die Entwicklung
+  // The dev server for development
   devServer: {
     port: 3000,
     hot: true,
     historyApiFallback: true,
   },
   
-  // Plugins für zusätzliche Funktionalität
+  // Plugins for additional functionality
   plugins: [
-    // Generiert HTML mit dem gebündelten JavaScript
+    // Generates HTML with the bundled JavaScript
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html'

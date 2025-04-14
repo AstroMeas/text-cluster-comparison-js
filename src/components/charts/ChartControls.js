@@ -1,15 +1,15 @@
 import React from 'react';
 
 /**
- * Chart-Kontrollkomponente zur Auswahl des anzuzeigenden Diagrammtyps
+ * Chart control component for selecting the chart type to display
  * 
- * @param {Object} props - Komponenten-Properties
- * @param {string} props.activeChart - Aktuell ausgewähltes Diagramm ('table', 'bubble', 'comparison')
- * @param {Function} props.onChangeChart - Callback für die Änderung des Diagrammtyps
- * @param {boolean} props.isAscending - Gibt an, ob Cluster aufsteigend sortiert sind
+ * @param {Object} props - Component properties
+ * @param {string} props.activeChart - Currently selected chart ('table', 'bubble', 'comparison')
+ * @param {Function} props.onChangeChart - Callback for changing the chart type
+ * @param {boolean} props.isAscending - Indicates whether clusters are sorted in ascending order
  */
 const ChartControls = ({ activeChart, onChangeChart, isAscending = false }) => {
-  // Stil für die Container-Karte
+  // Style for the container card
   const cardStyle = {
     display: 'flex',
     justifyContent: 'center',
@@ -20,13 +20,13 @@ const ChartControls = ({ activeChart, onChangeChart, isAscending = false }) => {
     boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
   };
   
-  // Stil für den Schaltflächen-Container
+  // Style for the button container
   const buttonGroupStyle = {
     display: 'flex',
     gap: '10px'
   };
   
-  // Stil für die Schaltflächen
+  // Style for the buttons
   const buttonStyle = (isActive) => ({
     padding: '10px 20px',
     border: 'none',
@@ -38,7 +38,7 @@ const ChartControls = ({ activeChart, onChangeChart, isAscending = false }) => {
     transition: 'all 0.3s'
   });
   
-  // Stil für deaktivierte Schaltflächen
+  // Style for disabled buttons
   const disabledButtonStyle = {
     padding: '10px 20px',
     border: 'none',
@@ -52,27 +52,27 @@ const ChartControls = ({ activeChart, onChangeChart, isAscending = false }) => {
   return (
     <div style={cardStyle}>
       <div>
-        <h3 style={{ marginBottom: '15px', textAlign: 'center' }}>Visualisierungstyp auswählen</h3>
+        <h3 style={{ marginBottom: '15px', textAlign: 'center' }}>Select Visualization Type</h3>
         <div style={buttonGroupStyle}>
           <button
             style={buttonStyle(activeChart === 'table')}
             onClick={() => onChangeChart('table')}
           >
-            Cluster-Tabelle
+            Cluster Table
           </button>
           <button
             style={buttonStyle(activeChart === 'bubble')}
             onClick={() => onChangeChart('bubble')}
           >
-            Bubble-Chart
+            Bubble Chart
           </button>
           <button
             style={isAscending ? buttonStyle(activeChart === 'comparison') : disabledButtonStyle}
             onClick={() => isAscending && onChangeChart('comparison')}
             disabled={!isAscending}
-            title={!isAscending ? "Nur verfügbar, wenn Cluster aufsteigend sortiert sind" : ""}
+            title={!isAscending ? "Only available when clusters are sorted in ascending order" : ""}
           >
-            Textvergleich
+            Text Comparison
           </button>
         </div>
       </div>

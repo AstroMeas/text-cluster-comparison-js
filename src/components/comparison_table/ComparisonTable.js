@@ -3,13 +3,13 @@ import './ComparisonTable.css';
 import { compareTexts, convertComparisonToCSV } from '../../services/clusterService';
 
 /**
- * ComparisonTable-Komponente zur Anzeige des strukturierten Textvergleichs
+ * ComparisonTable component for displaying the structured text comparison
  * 
- * @param {Object} props - Komponenten-Properties
- * @param {Array} props.clusters - Array mit Cluster-Daten
- * @param {Object} props.processed1 - Verarbeiteter erster Text
- * @param {Object} props.processed2 - Verarbeiteter zweiter Text
- * @param {Boolean} props.isAscending - Gibt an, ob Cluster aufsteigend sortiert sind
+ * @param {Object} props - Component properties
+ * @param {Array} props.clusters - Array with cluster data
+ * @param {Object} props.processed1 - Processed first text
+ * @param {Object} props.processed2 - Processed second text
+ * @param {Boolean} props.isAscending - Indicates whether clusters are sorted in ascending order
  */
 const ComparisonTable = ({ 
   clusters = [], 
@@ -17,14 +17,14 @@ const ComparisonTable = ({
   processed2,
   isAscending = false
 }) => {
-  // Zustand für die Vergleichsdaten
+  // State for comparison data
   const [comparisonData, setComparisonData] = useState([]);
   
-  // Zustand für Paginierung
+  // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
-  // Berechne Vergleichsdaten, wenn sich die Eingabedaten ändern
+  // Calculate comparison data when input data changes
   useEffect(() => {
     if (!processed1 || !processed2 || !isAscending) {
       setComparisonData([]);
@@ -32,7 +32,7 @@ const ComparisonTable = ({
     }
     
     try {
-      // Führe den Textvergleich durch
+      // Perform text comparison
       const result = compareTexts(
         processed1.stringTokens, 
         processed2.stringTokens, 
@@ -43,96 +43,96 @@ const ComparisonTable = ({
       
       setComparisonData(result);
     } catch (error) {
-      console.error('Fehler beim Vergleichen der Texte:', error);
+      console.error('Error comparing texts:', error);
       setComparisonData([]);
     }
   }, [clusters, processed1, processed2, isAscending]);
   
-  // Zurücksetzen auf die erste Seite, wenn sich die Vergleichsdaten ändern
+  // Reset to the first page when the comparison data changes
   useEffect(() => {
     setCurrentPage(1);
   }, [comparisonData]);
   
-  // Berechnung der Paginierung
+  // Pagination calculation
   const totalPages = Math.ceil(comparisonData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = comparisonData.slice(indexOfFirstItem, indexOfLastItem);
   
-  // Seiten-Navigation
+  // Page navigation
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   
-  // Funktion zum Herunterladen der CSV-Datei
+  // Function to download the CSV file
   const downloadCSV = useCallback(() => {
     if (comparisonData.length === 0) {
-      console.error('Keine Vergleichsdaten zum Herunterladen vorhanden');
+      console.error('No comparison data available for download');
       return;
     }
     
     try {
-      // Konvertiere Vergleichsdaten zu CSV
+      // Convert comparison data to CSV
       const csvData = convertComparisonToCSV(comparisonData, 'text1', 'text2');
       
-      // Erstelle einen Blob aus den CSV-Daten
+      // Create a blob from the CSV data
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       
-      // Erstelle einen temporären Link zum Herunterladen
+      // Create a temporary link for download
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'textvergleich.csv');
+      link.setAttribute('download', 'text_comparison.csv');
       link.style.display = 'none';
       
       document.body.appendChild(link);
       link.click();
       
-      // Aufräumen
+      // Cleanup
       setTimeout(() => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }, 100);
     } catch (err) {
-      console.error('Fehler beim Herunterladen der CSV-Datei:', err);
+      console.error('Error downloading CSV file:', err);
     }
   }, [comparisonData]);
   
-  // Wenn keine aufsteigend sortierten Cluster vorhanden sind
+  // If no clusters sorted in ascending order are available
   if (!isAscending) {
     return (
       <div className="card">
-        <div className="card-title">Textvergleich</div>
-        <p>Der Textvergleich ist nur verfügbar, wenn die Cluster aufsteigend sortiert sind. 
-          Bitte bereinige die Cluster zuerst.</p>
+        <div className="card-title">Text Comparison</div>
+        <p>Text comparison is only available when clusters are sorted in ascending order. 
+          Please clean the clusters first.</p>
       </div>
     );
   }
   
-  // Wenn keine Vergleichsdaten vorhanden sind
+  // If no comparison data is available
   if (comparisonData.length === 0) {
     return (
       <div className="card">
-        <div className="card-title">Textvergleich</div>
-        <p>Keine Vergleichsdaten verfügbar.</p>
+        <div className="card-title">Text Comparison</div>
+        <p>No comparison data available.</p>
       </div>
     );
   }
   
   return (
     <div className="card">
-      <div className="card-title">Textvergleich</div>
+      <div className="card-title">Text Comparison</div>
       
       <div className="comparison-description">
-        Diese Tabelle zeigt abwechselnd die einzigartigen Textabschnitte und die gemeinsamen Cluster.
-        Einzigartige Zeilen (orange) enthalten unterschiedliche Texte, Cluster-Zeilen (grün) zeigen 
-        übereinstimmende Textpassagen.
+        This table alternately shows unique text sections and common clusters.
+        Unique rows (orange) contain different texts, cluster rows (green) show 
+        matching text passages.
       </div>
       
       <div className="comparison-header">
-        <span>Gefundene Elemente: {comparisonData.length}</span>
+        <span>Found elements: {comparisonData.length}</span>
         <button className="download-button" onClick={downloadCSV}>
-          Als CSV herunterladen
+          Download as CSV
         </button>
       </div>
       
@@ -140,13 +140,13 @@ const ComparisonTable = ({
         <table className="comparison-table">
           <thead>
             <tr>
-              <th>Typ</th>
+              <th>Type</th>
               <th>Pos. Text 1</th>
               <th>Text 1</th>
               <th>Pos. Text 2</th>
               <th>Text 2</th>
-              <th>Cluster-Länge</th>
-              <th>Cluster-Inhalt</th>
+              <th>Cluster Length</th>
+              <th>Cluster Content</th>
             </tr>
           </thead>
           <tbody>
@@ -155,7 +155,7 @@ const ComparisonTable = ({
                 key={index} 
                 className={item.tag === 'unique' ? 'unique-row' : 'cluster-row'}
               >
-                <td>{item.tag === 'unique' ? 'Einzigartig' : 'Cluster'}</td>
+                <td>{item.tag === 'unique' ? 'Unique' : 'Cluster'}</td>
                 <td>{item.Pos_text1}</td>
                 <td className="comparison-content">{item.text1}</td>
                 <td>{item.Pos_text2}</td>
@@ -168,7 +168,7 @@ const ComparisonTable = ({
         </table>
       </div>
       
-      {/* Paginierung */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <>
           <div className="pagination">
@@ -177,12 +177,12 @@ const ComparisonTable = ({
               onClick={goToPrevPage}
               disabled={currentPage === 1}
             >
-              &laquo; Zurück
+              &laquo; Previous
             </button>
             
-            {/* Seitenzahlen */}
+            {/* Page numbers */}
             {[...Array(totalPages)].map((_, i) => {
-              // Beschränke die Anzahl der angezeigten Seitenzahlen
+              // Limit the number of displayed page numbers
               if (
                 i === 0 || 
                 i === totalPages - 1 || 
@@ -198,7 +198,7 @@ const ComparisonTable = ({
                   </button>
                 );
               }
-              // Ellipsis für ausgelassene Seiten
+              // Ellipsis for skipped pages
               if (i === currentPage - 3 || i === currentPage + 3) {
                 return <span key={i}>...</span>;
               }
@@ -210,11 +210,11 @@ const ComparisonTable = ({
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
             >
-              Weiter &raquo;
+              Next &raquo;
             </button>
           </div>
           <div className="pagination-info">
-            Seite {currentPage} von {totalPages}
+            Page {currentPage} of {totalPages}
           </div>
         </>
       )}
