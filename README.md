@@ -38,7 +38,7 @@ Key improvements in the JavaScript version:
 - npm 6.x or higher
 
 ### Setup Instructions
-
+Access the app via https://astromeas.github.io/text-cluster-comparison-js/
 ```bash
 # Clone the repository
 git clone https://github.com/AstroMeas/text-cluster-comparison-js.git
